@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary">
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/colorPrimaryDark"
+                android:layout_marginTop="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/tv_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/browse"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/tv_ranking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/icc_ranking"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/rankLay"
+                android:layout_width="match_parent"
+                android:layout_height="150sp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/item_bg_more"
+                android:paddingTop="5sp"
+                android:paddingBottom="5sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_ranking">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/team_ranking"
+                    android:layout_width="match_parent"
+                    android:layout_height="60sp"
+                    app:layout_constraintBottom_toTopOf="@id/line"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5">
+
+                    <ImageView
+                        android:id="@+id/img3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginTop="10sp"
+                        android:layout_marginBottom="10sp"
+                        android:contentDescription="@string/team_ranking"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/team_rankings"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/RateUsTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12sp"
+                        android:text="@string/team_ranking"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/img3"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:id="@+id/line"
+                    android:layout_width="match_parent"
+                    android:layout_height="2sp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@color/white"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/team_ranking">
+
+                </View>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/player_ranking"
+                    android:layout_width="match_parent"
+                    android:layout_height="60sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/line"
+                    app:layout_constraintVertical_bias="0.5">
+
+                    <ImageView
+                        android:id="@+id/imgFeedback"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:contentDescription="@string/player_ranking"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/player_rankings"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/feebackText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12sp"
+                        android:text="@string/player_ranking"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/imgFeedback"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/tv_browse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/browse_more"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rankLay" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/browseLay"
+                android:layout_width="match_parent"
+                android:layout_height="150sp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/item_bg_more"
+                android:paddingTop="5sp"
+                android:paddingBottom="5sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_browse">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/browseSeries"
+                    android:layout_width="match_parent"
+                    android:layout_height="60sp"
+                    app:layout_constraintBottom_toTopOf="@id/line2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5">
+
+                    <ImageView
+                        android:id="@+id/img4"
+                        android:layout_width="36sp"
+                        android:layout_height="36sp"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginTop="10sp"
+                        android:layout_marginBottom="10sp"
+                        android:contentDescription="@string/browse_series"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_browse_series"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/browseText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12sp"
+                        android:text="@string/browse_series"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/img4"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:id="@+id/line2"
+                    android:layout_width="match_parent"
+                    android:layout_height="2sp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@color/white"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/browseSeries">
+
+                </View>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/browseTeams"
+                    android:layout_width="match_parent"
+                    android:layout_height="60sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/line2"
+                    app:layout_constraintVertical_bias="0.5">
+
+                    <ImageView
+                        android:id="@+id/iv_browseTeams"
+                        android:layout_width="36sp"
+                        android:layout_height="36sp"
+                        android:layout_marginStart="24dp"
+                        android:contentDescription="@string/browse_teams"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_browse_teams"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tv_browseTeams"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12sp"
+                        android:text="@string/browse_teams"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/iv_browseTeams"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+            <com.google.android.gms.ads.nativead.NativeAdView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:layout_marginBottom="@dimen/_4sdp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:visibility="gone"
+                android:layout_centerInParent="true"
+                android:id="@+id/native_ad_view"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/browseLay"
+                app:layout_constraintVertical_bias="1.0">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/gnt_outline_shape"
+                    >
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="@dimen/gnt_no_size"
+                        android:layout_height="@dimen/gnt_no_size"
+                        android:layout_marginEnd="@dimen/gnt_default_margin"
+                        android:layout_marginStart="@dimen/gnt_default_margin"
+                        android:layout_marginTop="@dimen/gnt_default_margin"
+                        android:layout_marginBottom="@dimen/gnt_default_margin"
+                        app:layout_constraintDimensionRatio="H,4:1"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:orientation="horizontal"
+                        android:id="@+id/background"
+                        >
+                        <ImageView
+                            android:id="@+id/icon"
+                            android:layout_width="0dp"
+                            android:layout_weight="0"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="@dimen/gnt_no_margin"
+                            android:layout_marginStart="@dimen/gnt_no_margin"
+                            android:layout_marginBottom="@dimen/gnt_no_margin"
+                            android:layout_marginEnd="@dimen/gnt_no_margin"
+                            app:layout_constraintDimensionRatio="H,1:1"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/content"
+                            />
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="@dimen/gnt_no_size"
+                            android:layout_height="@dimen/gnt_no_size"
+                            android:layout_marginTop="@dimen/gnt_no_margin"
+                            android:layout_marginBottom="@dimen/gnt_no_margin"
+                            android:layout_marginStart="@dimen/gnt_default_margin"
+                            android:layout_marginEnd="@dimen/gnt_default_margin"
+                            android:orientation="vertical"
+                            android:id="@+id/content"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/icon"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            >
+                            <LinearLayout
+                                android:id="@+id/headline"
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/gnt_no_size"
+                                android:layout_weight="@dimen/gnt_text_row_weight"
+                                app:layout_constraintBottom_toTopOf="@+id/row_two"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                android:background="@android:color/transparent"
+                                >
+
+                                <TextView
+                                    android:id="@+id/primary"
+                                    android:textStyle="bold"
+                                    android:textSize="@dimen/gnt_text_size_large"
+                                    android:textColor="@color/gray"
+                                    android:lines="1"
+                                    android:layout_height="match_parent"
+                                    android:layout_width="wrap_content"
+                                    android:layout_marginTop="@dimen/gnt_no_margin"
+                                    android:layout_marginBottom="@dimen/gnt_no_margin"
+                                    android:layout_marginStart="@dimen/gnt_no_margin"
+                                    android:layout_marginEnd="@dimen/gnt_no_margin"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    ></TextView>
+                            </LinearLayout>
+                            <LinearLayout
+                                android:id="@+id/row_two"
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/gnt_no_size"
+                                android:layout_weight="@dimen/gnt_text_row_weight"
+                                app:layout_constraintBottom_toTopOf="@+id/cta"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/headline"
+                                >
+                                <TextView
+                                    android:background="@drawable/gnt_rounded_corners_shape"
+                                    android:layout_width="@dimen/gnt_ad_indicator_width"
+                                    android:gravity="center"
+                                    android:id="@+id/ad_notification_view"
+                                    android:layout_height="@dimen/gnt_ad_indicator_height"
+                                    android:layout_marginTop="@dimen/gnt_ad_indicator_top_margin"
+                                    android:layout_marginStart="@dimen/gnt_no_margin"
+                                    android:layout_marginEnd="@dimen/gnt_default_margin"
+                                    android:text="Ad"
+                                    android:textColor="@color/gnt_ad_green"
+                                    android:textStyle="bold"
+                                    android:textSize="@dimen/gnt_ad_indicator_text_size"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    >
+                                </TextView>
+                                <RatingBar
+                                    android:id="@+id/rating_bar"
+                                    android:background="@android:color/transparent"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="@dimen/gnt_text_size_small"
+                                    android:textColor="@color/gnt_gray"
+                                    android:numStars="5"
+                                    android:stepSize="0.1"
+                                    android:lines="1"
+                                    android:layout_marginTop="@dimen/gnt_no_margin"
+                                    android:layout_marginBottom="@dimen/gnt_no_margin"
+                                    android:layout_marginStart="@dimen/gnt_no_margin"
+                                    android:layout_marginEnd="@dimen/gnt_no_margin"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toEndOf="@id/ad_notification_view"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    style="?android:attr/ratingBarStyleSmall">
+
+                                </RatingBar>
+                                <TextView
+                                    android:id="@+id/secondary"
+                                    android:background="@color/gnt_white"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:gravity="top"
+                                    android:textSize="@dimen/gnt_text_size_small"
+                                    android:textColor="@color/gnt_gray"
+                                    android:lines="1"
+                                    android:layout_marginTop="@dimen/gnt_no_margin"
+                                    android:layout_marginBottom="@dimen/gnt_no_margin"
+                                    android:layout_marginStart="@dimen/gnt_no_margin"
+                                    android:layout_marginEnd="@dimen/gnt_no_margin"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toEndOf="@id/ad_notification_view"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    ></TextView>
+
+                            </LinearLayout>
+                            <androidx.appcompat.widget.AppCompatButton
+                                android:id="@+id/cta"
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/gnt_no_size"
+                                android:background="@color/gnt_blue"
+                                android:textColor="@color/gnt_white"
+                                android:lines="1"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/row_two"
+                                android:gravity="center"
+                                app:layout_constraintHeight_percent="0.35"
+                                />
+
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.gms.ads.nativead.NativeAdView>
+
+
+
+            <com.facebook.ads.NativeAdLayout
+                android:id="@+id/fb_native_ad_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/browseLay"
+                app:layout_constraintVertical_bias="1.0" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</layout>
