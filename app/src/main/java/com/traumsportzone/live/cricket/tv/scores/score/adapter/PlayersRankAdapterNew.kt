@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.traumsportzone.live.cricket.tv.scores.R
 import com.traumsportzone.live.cricket.tv.scores.databinding.ItemPlayerRankBinding
 import com.traumsportzone.live.cricket.tv.scores.score.model.PlayersRankingModel
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.CodeUtils.setSafeOnClickListener
 
 class PlayersRankAdapterNew(private val onClickListener: OnClickListener) :
     ListAdapter<PlayersRankingModel, PlayersRankAdapterNew.ViewHolder>(DiffCallback) {
@@ -58,7 +59,7 @@ class PlayersRankAdapterNew(private val onClickListener: OnClickListener) :
         val item = getItem(position)
         holder.bind(item)
 
-        holder.itemView.setOnClickListener {
+        holder.itemView.setSafeOnClickListener {
             onClickListener.onClick(item)
         }
     }

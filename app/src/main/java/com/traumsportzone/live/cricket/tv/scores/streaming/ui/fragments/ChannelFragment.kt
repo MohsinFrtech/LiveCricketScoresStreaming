@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -20,6 +22,7 @@ import com.traumsportzone.live.cricket.tv.scores.streaming.models.Channel
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.AdManagerListener
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.NavigateData
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.checkNativeAdProvider
 import com.traumsportzone.live.cricket.tv.scores.streaming.viewmodel.OneViewModel
 import java.util.ArrayList
 
@@ -29,7 +32,6 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
     private var adStatus=false
     private var navDirections: NavDirections?=null
     private var adProviderName="none"
-    private var nativeAdProviderName="none"
     private var nativeFieldVal=""
     private var listWithAd: List<Channel?> =
         ArrayList<Channel?>()
@@ -46,6 +48,8 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
         bindingChannel= DataBindingUtil.bind(view)
         bindingChannel?.lifecycleOwner=this
         adManager= context?.let { activity?.let { it1 -> AdManager(it, it1, this) } }
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+
         if (Constants.middleAdProvider.equals(Constants.startApp,true))
         {
             Log.d("providerval","mid"+ Constants.middleAdProvider)
@@ -55,6 +59,7 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
                 Constants.adMiddle, null,null,null,null)
 
         }
+        settingChannels()
         bindingChannel?.btnBack?.setOnClickListener{
 
             this.findNavController().popBackStack()
@@ -67,35 +72,14 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
 
     override fun onResume() {
         super.onResume()
-        settingChannels()
-    }
-
-    ///set channels
-    private fun settingChannels() {
-        val channelData: ChannelFragmentArgs by navArgs()
-        if (channelData.getEvent!=null)
-        {
-            bindingChannel?.eventNameChannel?.text= channelData.getEvent!!.name
-            setChannelAdapter(channelData.getEvent?.channels)
-        }
-
-    }
-
-    private fun setChannelAdapter(channels: List<Channel>?) {
-
         viewModel?.dataModelList?.observe(viewLifecycleOwner)
         {
-
-            if (!it.extra_3.isNullOrEmpty())
-            {
-                nativeFieldVal= it.extra_3!!
+            if (!it.extra_3.isNullOrEmpty()) {
+                nativeFieldVal = it.extra_3!!
             }
             if (!it.app_ads.isNullOrEmpty())
             {
                 adProviderName= adManager?.checkProvider(it.app_ads!!, Constants.adBefore).toString()
-                nativeAdProviderName=adManager?.checkProvider(it.app_ads!!,
-                    Constants.nativeAdLocation
-                ).toString()
                 Constants.location2TopProvider =adManager?.checkProvider(it.app_ads!!,
                     Constants.adLocation2top
                 ).toString()
@@ -124,6 +108,31 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
 
 
             }
+
+        }
+    }
+
+    ///set channels
+    private fun settingChannels() {
+        val channelData: ChannelFragmentArgs by navArgs()
+        if (channelData.getEvent!=null)
+        {
+            bindingChannel?.eventNameChannel?.text= channelData.getEvent!!.name
+            setChannelAdapter(channelData.getEvent?.channels)
+        }
+
+    }
+
+    private fun setChannelAdapter(channels: List<Channel>?) {
+
+        viewModel?.dataModelList?.observe(viewLifecycleOwner)
+        {
+
+            if (!it.extra_3.isNullOrEmpty())
+            {
+                nativeFieldVal= it.extra_3!!
+            }
+
             val liveChannels: MutableList<Channel> =
                 ArrayList<Channel>()
             for (channel in channels!!)
@@ -143,9 +152,9 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
                     it1.priority
                 }
 
-                listWithAd = if (nativeAdProviderName.equals(Constants.admob,true)) {
+                listWithAd = if (checkNativeAdProvider.equals(Constants.admob,true)) {
                     checkNativeAd(liveChannels)
-                } else if (nativeAdProviderName.equals(Constants.facebook,true)) {
+                } else if (checkNativeAdProvider.equals(Constants.facebook,true)) {
                     checkNativeAd(liveChannels)
                 } else {
                     liveChannels
@@ -153,7 +162,7 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
 
                 val adapter= context?.let { adManager?.let { it1 ->
                     ChannelAdapter(
-                        it, this, listWithAd, nativeAdProviderName,
+                        it, this, listWithAd, checkNativeAdProvider,
                         it1, nativeFieldVal
                     )
                 } }
@@ -178,7 +187,11 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
             if (adStatus)
             {
                 if (!adProviderName.equals("none",true)) {
+                    bindingChannel?.MainLottie?.visibility=View.VISIBLE
                     adManager?.showAds(adProviderName)
+                    requireActivity().window.setFlags(
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                 }
                 else
                 {
@@ -227,7 +240,10 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
     }
 
     override fun onAdFinish() {
-
+        if (bindingChannel?.MainLottie?.isVisible == true){
+            bindingChannel?.MainLottie?.visibility=View.GONE
+        }
+        requireActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         if (navDirections!=null)
         {
             findNavController().navigate(navDirections!!)

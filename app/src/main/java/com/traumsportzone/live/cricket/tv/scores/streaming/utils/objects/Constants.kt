@@ -27,7 +27,8 @@ object Constants {
     var middleAdProvider="none"
     const val adLocation2topPermanent = "Location2TopPermanent"
     var location2TopPermanentProvider="none"
-
+    var positionClick = -1
+    var previousClick = -1
     //Ad Locations
     const val adTap = "tap"
     const val adMore = "more"
@@ -68,7 +69,10 @@ object Constants {
 
     var splash_status = false
     var app_update_dialog = false
-
+    const val rateUsKey = "rateus"
+    var rateUsText = ""
+    var rateUsDialogValue: Boolean = false
+    var rateShown=false
     //Api data
     const val stringId = "4"
     var authToken = ""
@@ -98,8 +102,10 @@ object Constants {
     //userData
     const val userType1 = "flussonic"
     const val userType2 = "cdn"
-    const val userType3 = "p2p"
+    const val userType3 = "p24"
     const val userType4 = "cdnp2p"
+    const val userType5 = "app"
+
     const val phraseDel = "@"
     var userLink = ""
     var defaultString = ""

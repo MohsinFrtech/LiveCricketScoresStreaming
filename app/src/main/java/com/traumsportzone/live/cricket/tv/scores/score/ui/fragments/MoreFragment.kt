@@ -191,7 +191,7 @@ class MoreFragment : Fragment(), AdManagerListener {
         ///Privacy policy layout...
         binding?.MainPrivacyPolicy?.setOnClickListener {
             try {
-                val url = "https://traumsportzone.com/privacy"
+                val url = "https://traumsportzone.com"
                 val i = Intent(Intent.ACTION_VIEW)
                 i.data = Uri.parse(url)
                 startActivity(i)

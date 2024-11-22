@@ -8,26 +8,41 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
-
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.faketouch"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.screen.portrait"
+        android:required="false" />
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
     <application
         android:name=".MyApp"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:hardwareAccelerated="true"
-        android:icon="@drawable/icon"
+        android:icon="@mipmap/appicon"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:roundIcon="@drawable/icon"
+        android:roundIcon="@mipmap/appicon"
+        android:banner="@mipmap/appbanner"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Livecricketscoresupdates"
+        android:theme="@style/TvTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
-            android:name=".streaming.ui.activities.HomeScreen"
+            android:name=".streaming.ui.activities.EntryClass"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/HomeScreenTheme">
+            android:theme="@style/AppSplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -39,7 +54,26 @@
                 android:value="" />
         </activity>
 
+        <activity android:name=".streaming.ui.activities.HomeScreen"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/HomeScreenTheme">
 
+        </activity>
+
+        <activity
+            android:name=".tv.activities.TvHomeActivity"
+            android:exported="true"
+            android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
@@ -57,10 +91,36 @@
 
         </activity>
 
+        <activity
+            android:name=".tv.activities.TvChannelActivity"
+            android:exported="false"
+            android:screenOrientation="landscape">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+
+        <activity
+            android:name=".tv.activities.TvPlayScreen"
+            android:exported="false"
+            android:screenOrientation="landscape">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".tv.activities.TvMainActivity"
+            android:theme="@style/TvTheme"
+            android:exported="false"
+            android:screenOrientation="landscape">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-1404950966955952~3753648764" />
-        <!--<activity
+            android:value="ca-app-pub-5077877071835682~4246272625" />
+        <activity
             android:name=".streaming.ui.activities.ExpendedActivity"
             android:exported="true"
             android:launchMode="singleInstance"
@@ -71,13 +131,13 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.yummy.streaming.live.cricket.streaming.ui.activities.PlayerScreen" />
+                android:value=".streaming.ui.activities.PlayerScreen" />
         </activity>
 
 
         <meta-data
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-            android:value="com.yummy.streaming.live.cricket.streaming.utils.playerutils.CastOptionsProvider" />-->
+            android:value="com.traumsportzone.live.cricket.tv.scores.streaming.utils.playerutils.CastOptionsProvider" />
 
     </application>
 

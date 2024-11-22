@@ -112,6 +112,12 @@ class RecentMatchesFragment : Fragment(), NavigateData, AdManagerListener {
                     }
 
                 }
+                if(!liveScores.isNullOrEmpty()){
+
+                }
+                else{
+                    binding?.tvNoData?.visibility = View.VISIBLE
+                }
                 setAdapter2(liveScores)
             } else {
                 binding?.tvNoData?.visibility = View.VISIBLE
@@ -124,23 +130,39 @@ class RecentMatchesFragment : Fragment(), NavigateData, AdManagerListener {
 
     private fun setAdapter2(liveScores: List<LiveScoresModel?>) {
         try {
-            val listWithAd: List<LiveScoresModel?> =
-                if (checkNativeAdProvider != "none") {
-                    checkNativeAd(liveScores)
-                } else {
-                    liveScores
+            var tFormatList: MutableList<LiveScoresModel?> = liveScores.toMutableList()
+            if(!tFormatList.isNullOrEmpty())
+            {
+                tFormatList.sortBy {
+                    it?.id
                 }
+                val listWithAd: List<LiveScoresModel?> =
+                    if (checkNativeAdProvider != "none") {
+                        checkNativeAd(tFormatList)
+                    } else {
+                        tFormatList
+                    }
 
 
-            val listAdapter = LiveSliderAdapterNative(
-                requireContext(), this,
-                "recent", listWithAd, checkNativeAdProvider, adManager!!
-            )
 
-            binding?.rvMatches?.layoutManager =
-                LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            binding?.rvMatches?.adapter = listAdapter
-            listAdapter.submitList(listWithAd)
+                val listAdapter = LiveSliderAdapterNative(
+                    requireContext(), this,
+                    "recent", listWithAd, checkNativeAdProvider, adManager!!
+                )
+                binding?.rvMatches?.visibility=View.VISIBLE
+
+
+                binding?.rvMatches?.layoutManager =
+                    LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                binding?.rvMatches?.adapter = listAdapter
+                listAdapter.submitList(listWithAd)
+            }
+            else
+            {
+                binding?.rvMatches?.visibility=View.GONE
+                binding?.tvNoData?.visibility = View.VISIBLE
+
+            }
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -156,11 +178,11 @@ class RecentMatchesFragment : Fragment(), NavigateData, AdManagerListener {
     }
 
     override fun onAdLoad(value: String) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onAdFinish() {
-        TODO("Not yet implemented")
+
     }
 
 

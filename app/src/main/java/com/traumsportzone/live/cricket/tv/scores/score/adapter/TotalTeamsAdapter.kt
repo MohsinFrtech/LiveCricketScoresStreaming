@@ -9,6 +9,7 @@ import com.traumsportzone.live.cricket.tv.scores.databinding.ItemTeamNameBinding
 import com.traumsportzone.live.cricket.tv.scores.score.model.AllTeamsModel
 import com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.TeamFragmentDirections
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.NavigateData
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.CodeUtils.setSafeOnClickListener
 
 class TotalTeamsAdapter(private val listSeries: List<AllTeamsModel?>, private val teamFragment: NavigateData): ListAdapter<AllTeamsModel, TotalTeamsAdapter.ViewHolder>(DiffCallback) {
 
@@ -41,7 +42,7 @@ class TotalTeamsAdapter(private val listSeries: List<AllTeamsModel?>, private va
         val league = currentList[position]
         holder.bind(league)
 
-        holder.itemView.setOnClickListener {
+        holder.itemView.setSafeOnClickListener {
 
 
             val direction= league.team_id?.let { it1 ->

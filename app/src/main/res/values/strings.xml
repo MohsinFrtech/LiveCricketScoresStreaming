@@ -1,7 +1,6 @@
 <resources>
-    <string name="app_name">Live Cricket Scores &amp; Streaming</string>
-
-    <string name="facebook_app_id"></string>
+    <string name="app_name">Live Cricket TV &amp; Scores</string>
+    <string name="facebook_app_id">28456289453955329</string>
     <string name="download_app">Download App</string>
     <!--AppUpdateDialog-->
     <string name="update_text1">No,Thanks</string>
@@ -54,7 +53,7 @@
 
     <!--    home fragment-->
 
-    <string name="adblock">We detected ad blocker running on your device.Please disable adblocker and then use our app.</string>
+    <string name="adblock">We detected ad blocker or vpn running on your device.Please disable adblocker and then use our app.</string>
     <string name="ad_blocker">adblocker</string>
 
 <!--    live scores layout-->
@@ -84,6 +83,16 @@
         <item>T20</item>
         <item>ODI</item>
         <item>TEST</item>
+    </string-array>
+
+    <string-array name="matches_details">
+        <item>Commentary</item>
+        <item>Details</item>
+        <item>Scoreboard</item>
+        <item>Squads</item>
+        <item>News</item>
+
+
     </string-array>
 
 

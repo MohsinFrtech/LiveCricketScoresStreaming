@@ -14,7 +14,9 @@ import com.traumsportzone.live.cricket.tv.scores.score.model.SeriesScoresModel
 import com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.BrowseFragmentDirections
 import com.traumsportzone.live.cricket.tv.scores.score.utility.Cons
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.NavigateData
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.CodeUtils.setSafeOnClickListener
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.selectedSeriesId
+import java.util.Collections
 
 
 class SeriesItemAdapter(val context: Context, private val navigateData: NavigateData,
@@ -64,7 +66,7 @@ class SeriesItemAdapter(val context: Context, private val navigateData: Navigate
         binding?.executePendingBindings()
 
 
-        holder.itemView.setOnClickListener {
+        holder.itemView.setSafeOnClickListener {
 
             if (currentList[position].series_id!=null) {
                 selectedSeriesId = currentList[position].series_id!!

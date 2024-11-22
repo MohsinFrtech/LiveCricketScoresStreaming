@@ -1,13 +1,12 @@
-/*
-package com.yummy.streaming.live.cricket.streaming.ui.activities
+package com.traumsportzone.live.cricket.tv.scores.streaming.ui.activities
 
 import android.view.Menu
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.gms.cast.framework.media.widget.ExpandedControllerActivity
-import com.yummy.streaming.live.cricket.R
+import com.traumsportzone.live.cricket.tv.scores.R
 
 /////Class is for chromecast functionality
-class ExpendedActivity: ExpandedControllerActivity() {
+class ExpendedActivity : ExpandedControllerActivity() {
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -16,4 +15,4 @@ class ExpendedActivity: ExpandedControllerActivity() {
         CastButtonFactory.setUpMediaRouteButton(this, menu, R.id.media_route_menu_item)
         return true
     }
-}*/
+}

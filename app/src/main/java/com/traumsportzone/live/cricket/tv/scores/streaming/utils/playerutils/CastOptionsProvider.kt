@@ -1,5 +1,5 @@
-/*
-package com.yummy.streaming.live.cricket.streaming.utils.playerutils
+
+package com.traumsportzone.live.cricket.tv.scores.streaming.utils.playerutils
 
 import android.content.Context
 import com.google.android.gms.cast.CastMediaControlIntent
@@ -19,4 +19,4 @@ class CastOptionsProvider : OptionsProvider {
     override fun getAdditionalSessionProviders(p0: Context): MutableList<SessionProvider>? {
         return null
     }
-}*/
+}

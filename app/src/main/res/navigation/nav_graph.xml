@@ -29,6 +29,9 @@
             android:name="getDetails"
             app:nullable="true"
             app:argType="com.traumsportzone.live.cricket.tv.scores.score.model.LiveScoresModel" />
+        <action
+            android:id="@+id/action_live_details_to_newsDetailFragment"
+            app:destination="@id/newsDetailFragment" />
 
     </fragment>
 
@@ -190,6 +193,12 @@
             android:id="@+id/action_seriesMatchFragment_to_live_details"
             app:destination="@id/live_details" />
     </fragment>
+    <fragment
+        android:id="@+id/newsDetailFragment"
+        android:name="com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.matchdetail.NewsDetailFragment"
+        android:label="News Detail"
+        tools:layout="@layout/news_detail">
 
+    </fragment>
 </navigation>
 

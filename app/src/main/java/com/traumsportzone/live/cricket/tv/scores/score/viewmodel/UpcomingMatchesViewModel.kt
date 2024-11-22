@@ -61,9 +61,9 @@ class UpcomingMatchesViewModel : ViewModel() {
                     responseResult.let {
                         if (it != null) {
 
-                            it.sortedByDescending { it1 ->
-                                it1.updated_at
-                            }
+//                            it.sortedByDescending { it1 ->
+//                                it1.updated_at
+//                            }
 
                             _sliderList.value = it
                             _isLoading.value = false

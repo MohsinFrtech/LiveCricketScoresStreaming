@@ -44,5 +44,5 @@
 
     <color name="more_icon_color">#FFFFFF</color>
     <color name="text_color">#FFFFFF</color>
-    <color name="switchinactive">#5E5956</color>
+    <color name="switchinactive">#801E1C1B</color>
 </resources>

@@ -1,13 +1,19 @@
 package com.traumsportzone.live.cricket.tv.scores.score.utility
 
+import android.text.format.DateFormat
+import android.view.View
 import com.google.android.gms.ads.nativead.NativeAd
+import com.traumsportzone.live.cricket.tv.scores.streaming.adapters.ChannelAdapter
 import java.text.SimpleDateFormat
 import java.util.*
 
 object Cons {
     var s_token = ""
+    var matchId = 0
     var socketUrl = ""
     var socketAuth = ""
+    var newsId = ""
+
     var port = ""
     const val match_format_t20 = "t20"
     const val match_format_test = "test"
@@ -24,8 +30,8 @@ object Cons {
     const val player_allRounders = "allrounders"
 
     var base_url_scores = ""
-    var currentNativeAd: NativeAd?=null
-    var currentNativeAdFacebook:com.facebook.ads.NativeAd?=null
+    var currentNativeAd: NativeAd? = null
+    var currentNativeAdFacebook: com.facebook.ads.NativeAd? = null
 
     fun convertLongToTime(time: Long): String {
         val date = Date(time)
@@ -38,5 +44,38 @@ object Cons {
         val format = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
         return format.format(date)
     }
+
+    fun dateAndTime(channelDate: String?): String {
+        try {
+            val df = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+            df.timeZone = TimeZone.getTimeZone("UTC")
+            val date = channelDate?.let { df.parse(it) }
+            df.timeZone = TimeZone.getDefault()
+            val formattedDate = date?.let { df.format(it) }
+            val date2: Date? = formattedDate?.let { df.parse(it) }
+            val cal = Calendar.getInstance()
+            if (date2 != null) {
+                cal.time = date2
+            }
+
+            val dayOfTheWeek =
+                DateFormat.format("EEEE", date) as String
+
+            val day = DateFormat.format("dd", date) as String
+
+            val monthString =
+                DateFormat.format("MMM", date) as String
+            val year = DateFormat.format("yyyy", date) as String
+
+
+
+            return "$dayOfTheWeek,$day $monthString $year"
+
+        } catch (e: Exception) {
+            return ""
+        }
+
+    }
+
 
 }

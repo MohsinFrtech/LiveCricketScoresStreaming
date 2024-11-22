@@ -12,9 +12,12 @@ import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.traumsportzone.live.cricket.tv.scores.BuildConfig
@@ -27,6 +30,7 @@ import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.CustomD
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.DebugChecker
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.SharedPreference
 import com.traumsportzone.live.cricket.tv.scores.utils.InternetUtil
+import com.traumsportzone.live.cricket.tv.scores.utils.InternetUtil.isPrivateDnsSetup
 import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.File
@@ -67,13 +71,32 @@ class HomeScreen : AppCompatActivity(), DialogListener {
         bindingHome?.versionTxt?.text = "v  " + BuildConfig.VERSION_NAME
 
         //FirebaseApp.initializeApp(this)
+        onBackPressedDispatcher.addCallback(this,object : OnBackPressedCallback(true){
+            override fun handleOnBackPressed() {
+                if (bindingHome?.notificationLayout?.isVisible == true || bindingHome?.internetLay?.isVisible == true){
+                    finishAffinity()
+                }
+                else
+                {
+
+                }
+            }
+        })
 
         bindingHome?.retry?.setOnClickListener {
-            if (!DebugChecker.checkDebugging(this)) {
-                emulatorCheck()
+            bindingHome?.homeAnimLayout?.visibility = View.VISIBLE
+            if(InternetUtil.isInternetOn(this)){
+                bindingHome?.internetLay?.visibility = View.GONE
+                Handler(Looper.getMainLooper()).postDelayed({
+                    if (!DebugChecker.checkDebugging(this)) {
+                        emulatorCheck()
+                    }
+                },2000)
+            }else {
+                Handler(Looper.getMainLooper()).postDelayed({
+                    bindingHome?.homeAnimLayout?.visibility = View.GONE
+                }, 2000)
             }
-
-
         }
 
         bindingHome?.yesBtn?.setOnClickListener {
@@ -91,8 +114,6 @@ class HomeScreen : AppCompatActivity(), DialogListener {
 
 
     private fun checkNotificationPermission() {
-
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             when {
                 ContextCompat.checkSelfPermission(
@@ -181,18 +202,32 @@ class HomeScreen : AppCompatActivity(), DialogListener {
 
     override fun onResume() {
         super.onResume()
-
-
         if (!DebugChecker.checkDebugging(this)) {
             Handler(Looper.getMainLooper()).postDelayed(
                 {
-                    emulatorCheck()
-
+                    if(isPrivateDnsSetup(this))
+                    {
+                        Toast.makeText(
+                            this,
+                            "Please turn off private dns,If not found then search dns in setting search",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        try {
+                            startActivityForResult(Intent(Settings.ACTION_SETTINGS), 0)
+                        }
+                        catch (e:Exception){
+                            Log.d("Exception","msg")
+                        }
+                    }
+                    else
+                    {
+                        emulatorCheck()
+                    }
                 },
                 2000
             )
-
         }
+
 
     }
 
@@ -252,8 +287,8 @@ class HomeScreen : AppCompatActivity(), DialogListener {
                 "", "Ok", "baseValue"
             )
         } else {
-            navigationToNextScreen()
-            //checkNotificationPermission()
+//            navigationToNextScreen()
+            checkNotificationPermission()
         }
     }
 
@@ -265,14 +300,11 @@ class HomeScreen : AppCompatActivity(), DialogListener {
     ///Navigation to next Screen
     private fun navigationToNextScreen() {
         if (InternetUtil.isInternetOn(this)) {
-            bindingHome?.lottieAnimLayout?.visibility = View.GONE
-            bindingHome?.noInternetText?.visibility = View.GONE
-            bindingHome?.retry?.visibility = View.GONE
+            bindingHome?.internetLay?.visibility=View.GONE
             moveToMainScreen()
         } else {
-            bindingHome?.lottieAnimLayout?.visibility = View.VISIBLE
-            bindingHome?.noInternetText?.visibility = View.VISIBLE
-            bindingHome?.retry?.visibility = View.VISIBLE
+            bindingHome?.internetLay?.visibility=View.VISIBLE
+
             bindingHome?.homeAnimLayout?.visibility = View.GONE
 
         }

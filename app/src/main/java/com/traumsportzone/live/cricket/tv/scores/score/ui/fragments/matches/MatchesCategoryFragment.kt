@@ -126,23 +126,37 @@ class MatchesCategoryFragment : Fragment(), NavigateData, AdManagerListener {
         try {
 //            binding?.progressBar?.visibility=View.GONE
             //val listAdapter = LiveSliderAdapter(requireContext(), this, "recent")
-
-            val listWithAd: List<LiveScoresModel?> =
-                if (Constants.checkNativeAdProvider != "none") {
-                    MyNativeAd.checkNativeAd(liveScores)
-                } else {
-                    liveScores
+            var tFormatList: MutableList<LiveScoresModel?> = liveScores.toMutableList()
+            if(!tFormatList.isNullOrEmpty()) {
+                tFormatList.sortBy {
+                    it?.id
                 }
 
-            val listAdapter = LiveSliderAdapterNative(
-                requireContext(), this,
-                "recent", listWithAd, Constants.checkNativeAdProvider, adManager!!
-            )
 
-            binding?.rvMatches?.layoutManager =
-                LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-            binding?.rvMatches?.adapter = listAdapter
-            listAdapter.submitList(listWithAd)
+                val listWithAd: List<LiveScoresModel?> =
+                    if (Constants.checkNativeAdProvider != "none") {
+                        MyNativeAd.checkNativeAd(tFormatList)
+                    } else {
+                        tFormatList
+                    }
+
+                val listAdapter = LiveSliderAdapterNative(
+                    requireContext(), this,
+                    "recent", listWithAd, Constants.checkNativeAdProvider, adManager!!
+                )
+                binding?.rvMatches?.visibility=View.VISIBLE
+
+                binding?.rvMatches?.layoutManager =
+                    LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+                binding?.rvMatches?.adapter = listAdapter
+                listAdapter.submitList(listWithAd)
+            }
+            else
+            {
+                binding?.rvMatches?.visibility=View.GONE
+                binding?.tvNoData?.visibility = View.VISIBLE
+            }
+
 
         } catch (e: Exception) {
             e.printStackTrace()

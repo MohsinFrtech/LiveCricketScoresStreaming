@@ -7,7 +7,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.chartboost.sdk.Chartboost
 import com.chartboost.sdk.ads.Interstitial
@@ -45,6 +47,7 @@ import com.traumsportzone.live.cricket.tv.scores.streaming.utils.Logger
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.AdManagerListener
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.admobInterstitial
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.nativeAdmob
 
 class AdManager(
     private val context: Context,
@@ -241,7 +244,7 @@ class AdManager(
                 Constants.unityTestMode,
                 object : IUnityAdsInitializationListener {
                     override fun onInitializationComplete() {
-                        if (UnityAds.isInitialized()) {
+                        if (UnityAds.isInitialized) {
 
                             Constants.isUnitySdkInit = true
                             loadAdAtParticularLocation(
@@ -281,6 +284,10 @@ class AdManager(
 
             }
 
+            override fun onBannerShown(bannerAdView: BannerView?) {
+
+            }
+
             override fun onBannerFailedToLoad(
                 bannerAdView: BannerView,
                 errorInfo: BannerErrorInfo
@@ -312,6 +319,10 @@ class AdManager(
                 if (topBannerUnity != null) {
                     showBanner(relativeLayout, topBannerUnity!!)
                 }
+
+            }
+
+            override fun onBannerShown(bannerAdView: BannerView?) {
 
             }
 
@@ -717,7 +728,7 @@ class AdManager(
             try {
                 StartAppSDK.init(context, Constants.startAppId, false)
                 StartAppAd.disableSplash()
-                StartAppSDK.setTestAdsEnabled(true)
+//                StartAppSDK.setTestAdsEnabled(true)
                 Constants.isStartAppSdkInit = true
                 loadAdAtParticularLocation(
                     adLocation,
@@ -937,8 +948,10 @@ class AdManager(
     }
 
 
-    fun loadFacebookNativeAd(nativeAdLayout: NativeAdLayout) {
-        fbNativeAd = NativeAd(context, Constants.nativeFacebook)
+    fun loadFacebookNativeAd(
+        fbNativeAd: NativeAd, nativeAdLayout: NativeAdLayout,
+        adLayout: ConstraintLayout?
+    ) {
         val nativeAdListener: NativeAdListener = object : NativeAdListener {
             override fun onMediaDownloaded(ad: Ad) {
 
@@ -946,20 +959,15 @@ class AdManager(
             }
 
             override fun onError(ad: Ad?, adError: AdError) {
-                Log.d("nativeError", "error" + adError.errorMessage)
 
+                adLayout?.visibility = View.GONE
                 // Native ad failed to load
             }
 
             override fun onAdLoaded(ad: Ad) {
-                Log.d("nativeError", "okay")
-
+                adLayout?.visibility = View.INVISIBLE
                 // Native ad is loaded and ready to be displayed
-                if (fbNativeAd != null) {
-                    nativeAdLayout.visibility = View.VISIBLE
-                    inflateFbNativeAd(fbNativeAd!!, nativeAdLayout)
-
-                }
+                inflateFbNativeAd(fbNativeAd, nativeAdLayout)
             }
 
             override fun onAdClicked(ad: Ad) {
@@ -972,15 +980,14 @@ class AdManager(
         }
 
         // Request an ad
-        fbNativeAd?.buildLoadAdConfig()
-            ?.withAdListener(nativeAdListener)
-            ?.build().let {
-                fbNativeAd?.loadAd(
+        fbNativeAd.buildLoadAdConfig()
+            .withAdListener(nativeAdListener)
+            .build().let {
+                fbNativeAd.loadAd(
                     it
                 )
             }
     }
-
 
     //    ////To inflate facebook native view
     fun inflateFbNativeAd(
@@ -1026,9 +1033,11 @@ class AdManager(
         )
     }
 
-    fun loadAdmobNativeAd(view_holder: ViewHolder?, nativeAdView: NativeAdView?) {
-        val builder = AdLoader.Builder(context, Constants.nativeAdmob)
-        //val builder = AdLoader.Builder(context, "ca-app-pub-3940256099942544/2247696110") //testId
+    fun loadAdmobNativeAd(
+        view_holder: RecyclerView.ViewHolder?, nativeAdView: NativeAdView,
+        adLayout: ConstraintLayout?
+    ) {
+        val builder = AdLoader.Builder(context, nativeAdmob)
         builder.forNativeAd { nativeAd ->
 
             currentNativeAd?.destroy()
@@ -1049,18 +1058,19 @@ class AdManager(
         val adLoader = builder.withAdListener(object : AdListener() {
             override fun onAdFailedToLoad(loadAdError: LoadAdError) {
 
-                nativeAdView?.visibility = View.GONE
-
+                logger.printLog(taG, "Admob Native $loadAdError")
+                nativeAdView.visibility = View.GONE
+                adLayout?.visibility = View.GONE
             }
 
             override fun onAdLoaded() {
-                adView = if (view_holder != null) {
-
-                    view_holder.itemView.findViewById(R.id.native_ad_view)
-                } else {
-                    nativeAdView
+                if (view_holder!=null) {
+                    adView = view_holder?.itemView?.findViewById(R.id.native_ad_view)
+                }else
+                {
+                    adView =nativeAdView
                 }
-
+                adLayout?.visibility = View.INVISIBLE
                 android.os.Handler(Looper.getMainLooper()).postDelayed({
                     adView?.let {
                         currentNativeAd?.let { it1 ->
@@ -1072,7 +1082,6 @@ class AdManager(
                     }
 
                 }, 100)
-
             }
         }).build()
 
@@ -1080,27 +1089,29 @@ class AdManager(
 
     }
 
-
     fun populateNativeAdView(
         nativeAd: com.google.android.gms.ads.nativead.NativeAd,
         adView: NativeAdView
     ) {
         try {
+
             adView.visibility = View.VISIBLE
             // Set the media view.
 //            adView.mediaView = adView.findViewById(com.google.android.gms.ads.R.id.ad_media)
             // Set other ad assets.
-            adView.headlineView = adView.findViewById(R.id.headline)
+//            adView.headlineView = adView.findViewById(R.id.headline)
 //            adView.bodyView = adView.findViewById(com.google.android.ads.nativetemplates.R.id.body)
             adView.callToActionView = adView.findViewById(R.id.cta)
             adView.iconView = adView.findViewById(R.id.icon)
 //            adView.priceView = adView.findViewById(com.google.android.gms.ads.R.id.ad_price)
             adView.starRatingView = adView.findViewById(R.id.rating_bar)
             adView.storeView = adView.findViewById(R.id.secondary)
+            adView.headlineView = adView.findViewById(R.id.primary)
 //            adView.advertiserView = adView.findViewById(com.google.android.gms.ads.R.id.ad_advertiser)
 
+//           val primaryView =  findViewById(R.id.primary)
             // The headline and media content are guaranteed to be in every UnifiedNativeAd.
-//            (adView.headlineView as TextView).text = nativeAd.headline
+            (adView.headlineView as TextView).text = nativeAd.headline
 //            nativeAd.mediaContent?.let { adView.mediaView?.setMediaContent(it) }
 
             // These assets aren't guaranteed to be in every UnifiedNativeAd, so it's important to

@@ -1,6 +1,7 @@
 package com.traumsportzone.live.cricket.tv.scores.score.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -63,10 +64,7 @@ class UpcomingMatchesFragment : Fragment(), NavigateData, AdManagerListener {
     private fun setUpViewModel() {
         upcomingViewModel.isTabSelect.observe(viewLifecycleOwner)
         {
-
-
             showFilteredList(it)
-
         }
     }
 
@@ -97,7 +95,12 @@ class UpcomingMatchesFragment : Fragment(), NavigateData, AdManagerListener {
                     if (match?.match_format.equals(s, true)) {
                         match?.let { it1 -> liveScores.add(it1) }
                     }
+                }
+                if(!liveScores.isNullOrEmpty()){
 
+                }
+                else{
+                    bindingUpcomingMatches?.tvNoData?.visibility = View.VISIBLE
                 }
                 setAdapter2(liveScores)
             } else {
@@ -114,23 +117,39 @@ class UpcomingMatchesFragment : Fragment(), NavigateData, AdManagerListener {
         try {
 //            binding?.progressBar?.visibility=View.GONE
             //val listAdapter = LiveSliderAdapter(requireContext(),this,"recent")
-
-            val listWithAd: List<LiveScoresModel?> =
-                if (checkNativeAdProvider != "none") {
-                    MyNativeAd.checkNativeAd(liveScores)
-                } else {
-                    liveScores
+            var tFormatList: MutableList<LiveScoresModel?> = liveScores.toMutableList()
+            if(!tFormatList.isNullOrEmpty()) {
+                tFormatList.sortBy {
+                    it?.id
                 }
 
-            val listAdapter = LiveSliderAdapterNative(
-                requireContext(), this,
-                "recent", listWithAd, checkNativeAdProvider, adManager!!
-            )
 
-            bindingUpcomingMatches?.rvMatches?.layoutManager =
-                LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            bindingUpcomingMatches?.rvMatches?.adapter = listAdapter
-            listAdapter.submitList(listWithAd)
+                val listWithAd: List<LiveScoresModel?> =
+                    if (checkNativeAdProvider != "none") {
+                        MyNativeAd.checkNativeAd(tFormatList)
+                    } else {
+                        tFormatList
+                    }
+
+                val listAdapter = LiveSliderAdapterNative(
+                    requireContext(), this,
+                    "recent", listWithAd, checkNativeAdProvider, adManager!!
+                )
+                bindingUpcomingMatches?.rvMatches?.visibility=View.VISIBLE
+
+                bindingUpcomingMatches?.rvMatches?.layoutManager =
+                    LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                bindingUpcomingMatches?.rvMatches?.adapter = listAdapter
+                listAdapter.submitList(listWithAd)
+            }
+            else
+            {
+                bindingUpcomingMatches?.rvMatches?.visibility=View.GONE
+                bindingUpcomingMatches?.tvNoData?.visibility = View.VISIBLE
+
+            }
+
+
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -142,10 +161,10 @@ class UpcomingMatchesFragment : Fragment(), NavigateData, AdManagerListener {
     }
 
     override fun onAdLoad(value: String) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onAdFinish() {
-        TODO("Not yet implemented")
+
     }
 }

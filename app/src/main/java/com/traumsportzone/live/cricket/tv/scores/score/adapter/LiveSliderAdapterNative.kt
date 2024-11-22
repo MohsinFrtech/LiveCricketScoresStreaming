@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.facebook.ads.NativeAd
 import com.traumsportzone.live.cricket.tv.scores.MainFragmentDirections
 import com.traumsportzone.live.cricket.tv.scores.R
 import com.traumsportzone.live.cricket.tv.scores.databinding.LiveSliderLayoutBinding
@@ -20,6 +21,7 @@ import com.traumsportzone.live.cricket.tv.scores.score.utility.Cons
 import com.traumsportzone.live.cricket.tv.scores.score.utility.Cons.convertLongToTime
 import com.traumsportzone.live.cricket.tv.scores.streaming.adsData.AdManager
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.NavigateData
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.CodeUtils.setSafeOnClickListener
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants
 
 class LiveSliderAdapterNative(
@@ -38,6 +40,7 @@ class LiveSliderAdapterNative(
     private val nativeAdsLayout = 1
     private val simpleMenuLayout = 0
     private var binding2: NativeAdLayoutBinding? = null
+    private var fbNativeAd: NativeAd? = null
 
 
     class LiveSliderAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -94,35 +97,44 @@ class LiveSliderAdapterNative(
 
                 if (adType.equals(Constants.facebook, true)) {
 
-//                    val params = binding2?.fbNativeAdContainer?.layoutParams
-//                    params?.width = ViewGroup.LayoutParams.MATCH_PARENT
-//                    params?.height = 432
-//                    binding2?.fbNativeAdContainer?.layoutParams = params
-
                     if (Cons.currentNativeAdFacebook != null) {
                         binding2?.fbNativeAdContainer?.let {
                             adManager.inflateFbNativeAd(
-                                Cons.currentNativeAdFacebook!!,it
+                                Cons.currentNativeAdFacebook!!, it
+                            )
+                        }
+                    }
+                    else
+                    {
+                        fbNativeAd = NativeAd(context, Constants.nativeFacebook)
+                        binding2?.adLoadLay2?.visibility = View.VISIBLE
+                        binding2?.fbNativeAdContainer?.let {
+                            adManager.loadFacebookNativeAd(
+                                fbNativeAd!!,
+                                it, binding2?.adLoadLay2
                             )
                         }
                     }
                 } else if (adType.equals(Constants.admob, true)) {
 
-                    /*val params = binding2?.nativeAdView?.layoutParams
-                    params?.width = ViewGroup.LayoutParams.MATCH_PARENT
-                    params?.height = 432
-                    binding2?.nativeAdView?.layoutParams = params*/
-
-
                     if (Cons.currentNativeAd != null) {
                         binding2?.nativeAdView?.let {
-                            adManager?.populateNativeAdView(
+                            adManager.populateNativeAdView(
                                 Cons.currentNativeAd!!,
                                 it
                             )
                         }
+//                        binding2?.nativeAdView?.let { adManager.loadAdmobNativeAd(viewHolder, it) }
+                    } else {
+                        binding2?.adLoadLay?.visibility = View.VISIBLE
+                        binding2?.nativeAdView?.let {
+                            adManager.loadAdmobNativeAd(
+                                viewHolder,
+                                it,
+                                binding2?.adLoadLay
+                            )
+                        }
                     }
-
                 }
             }
             else -> {
@@ -437,7 +449,8 @@ class LiveSliderAdapterNative(
                     binding?.tvTime?.text =
                         convertLongToTime(data.start_time!!) + " - " + convertLongToTime(data.end_time!!)
                 }
-                holder.itemView.setOnClickListener {
+                holder.itemView.setSafeOnClickListener {
+                    Cons.matchId =currentList[position].match_id
                     if (!data.status.isNullOrEmpty()) {
                         if (source.equals("main", true)) {
 

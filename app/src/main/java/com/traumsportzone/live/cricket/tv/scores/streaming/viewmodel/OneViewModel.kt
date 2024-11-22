@@ -76,8 +76,8 @@ class OneViewModel(application: Application?) : AndroidViewModel(application!!) 
                     val addUser = StoneFile()
                     addUser.id = stringId
                     addUser.auth_token = cementType
-//                    addUser.build_no = appVersionCode.toString()
-                    addUser.build_no = "0"
+                    addUser.build_no = appVersionCode.toString()
+//                    addUser.build_no = "0"
 
                     val body = Gson().toJson(addUser)
                         .toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
@@ -124,7 +124,7 @@ class OneViewModel(application: Application?) : AndroidViewModel(application!!) 
 
 
                                 } catch (e: Exception) {
-
+                                    Log.d("ExceptionValue","val"+e.message)
                                     isLoading.value = false
                                     isInternet.value = false
                                     //e.printStackTrace();
@@ -153,7 +153,6 @@ class OneViewModel(application: Application?) : AndroidViewModel(application!!) 
         } else {
             isLoading.value = false
             isInternet.value = false
-
         }
 
     }

@@ -1,9 +1,14 @@
 package com.traumsportzone.live.cricket.tv.scores.streaming.ui.activities
 
+import android.app.UiModeManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.media.AudioManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +17,7 @@ import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -19,6 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -31,6 +38,20 @@ import com.google.android.exoplayer2.trackselection.TrackSelector
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.upstream.*
 import com.google.android.exoplayer2.util.MimeTypes
+import com.google.android.gms.cast.MediaInfo
+import com.google.android.gms.cast.MediaLoadRequestData
+import com.google.android.gms.cast.framework.CastButtonFactory
+import com.google.android.gms.cast.framework.CastContext
+import com.google.android.gms.cast.framework.CastSession
+import com.google.android.gms.cast.framework.SessionManagerListener
+import com.google.android.gms.cast.framework.media.RemoteMediaClient
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.tasks.Task
+import com.p2pengine.core.p2p.EngineExceptionListener
+import com.p2pengine.core.p2p.PlayerInteractor
+import com.p2pengine.core.utils.EngineException
+import com.p2pengine.sdk.P2pEngine
 /*import com.p2pengine.core.p2p.EngineExceptionListener
 import com.p2pengine.core.p2p.PlayerInteractor
 import com.p2pengine.core.utils.EngineException
@@ -46,11 +67,13 @@ import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constan
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.adLocation2topPermanent
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.location2BottomProvider
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.location2TopPermanentProvider
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.locationAfter
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.userLinkVal
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.userType3
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.DebugChecker
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Defamation
 import com.traumsportzone.live.cricket.tv.scores.streaming.viewmodel.OneViewModel
+import com.traumsportzone.live.cricket.tv.scores.utils.InternetUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executor
@@ -109,12 +132,17 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
     enum class PlaybackLocation {
         LOCAL, REMOTE
     }
+    private var booleanVpn: Boolean? = false
 
     //Checking player state...
     enum class PlaybackState {
         PLAYING, IDLE
     }
 
+    private var mCastContextTask: Task<CastContext>? = null
+    private var mCastContext: CastContext? = null
+    private var mSessionManagerListener: SessionManagerListener<CastSession>? = null
+    private var mCastSession: CastSession? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_exo_test_player)
@@ -127,13 +155,15 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
         val exoView: ConstraintLayout? = binding?.playerView?.findViewById(R.id.exoControlView)
         bindingExoPlayback = exoView?.let { ExoPlaybackControlViewBinding.bind(it) }
         mLocation = PlaybackLocation.LOCAL
-//        setupActionBar()
+        setupActionBar()
         //getAppVolumeLevel()
         //getAppBrightnessLevel()
         //swipeVolumeFeature()
         changeOrientation()
         //swipeBrightnessFeature()
-        //initializeCastSdk()
+        if (isGooglePlayServicesAvailable(this)) {
+            initializeCastSdk()
+        }
         getNavValues()
         checkForAds()
         screenModeController()
@@ -142,8 +172,14 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
             override fun handleOnBackPressed() {
 
                 if (adStatus) {
-                    if (!Constants.locationAfter.equals("none", true)) {
-                        adManager?.showAds(Constants.locationAfter)
+                    if (!locationAfter.equals("none", true)) {
+                        if (player != null) {
+                            player?.stop()
+                            player!!.release()
+                            player = null
+                        }
+                        adManager?.showAds(locationAfter)
+                        binding?.lottiePlayer2?.visibility = View.VISIBLE
                     }
                 } else {
                     Constants.videoFinish = true
@@ -183,23 +219,11 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
             } else if (channel_Type.equals(userType3, true)) {
                 if (path.isNotEmpty()) {
                     lifecycleScope.launch(Dispatchers.Main) {
-//                        setUpPlayerP2p(path)
+                        setUpPlayerP2p(path)
                     }
                 }
             } else {
-                binding?.lottiePlayer?.visibility = View.VISIBLE
-                viewModel.getDemoData()
-                viewModel.userLinkStatus.observe(this) {
-                    if (it == true) {
-                        path = userLinkVal
-                        if (path.isNotEmpty()) {
-                            lifecycleScope.launch(Dispatchers.Main) {
-//                                setUpPlayerP2p(path)
-                            }
-                        }
-                    }
-                }
-
+                setUpPlayer(path)
             }
 
         } catch (e: Exception) {
@@ -221,13 +245,14 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
         loadLocation2TopPermanentProvider()
         loadLocation2BottomProvider()
     }
+
     private fun loadLocation2BottomProvider() {
         if (!location2BottomProvider.equals("none", true)) {
             binding?.adViewBottom?.let { it1 ->
                 binding?.fbAdViewBottom?.let { it2 ->
                     adManager?.loadAdProvider(
                         location2BottomProvider, adLocation2bottom,
-                        it1, it2, binding?.unityBannerViewBottom,binding?.startAppBannerBottom
+                        it1, it2, binding?.unityBannerViewBottom, binding?.startAppBannerBottom
                     )
                 }
             }
@@ -287,150 +312,153 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
 
         }
     }
+    private fun setUpPlayerP2p(link: String?) {
+
+        try {
+            logger.printLog(tAG, "setUpPlayer P2p")
+            val parsedUrl = P2pEngine.getInstance()?.parseStreamUrl(link!!)
+
+            // Create LoadControl
+            val loadControl: LoadControl = DefaultLoadControl.Builder()
+                .setAllocator(DefaultAllocator(true, 16))
+                .setBufferDurationsMs(
+                    VideoPlayerConfig.MIN_BUFFER_DURATION,
+                    VideoPlayerConfig.MAX_BUFFER_DURATION,
+                    VideoPlayerConfig.MIN_PLAYBACK_START_BUFFER,
+                    VideoPlayerConfig.MIN_PLAYBACK_RESUME_BUFFER
+                )
+                .setTargetBufferBytes(-1)
+                .setPrioritizeTimeOverSizeThresholds(true)
+                .build()
+
+            binding?.lottiePlayer?.visibility = View.GONE
+
+            val meter: BandwidthMeter = DefaultBandwidthMeter.Builder(this).build()
+            val trackSelector: TrackSelector = DefaultTrackSelector(this)
+            // 2. Create a default LoadControl
+            player = null
+            player = context?.let {
+                ExoPlayer.Builder(it)
+                    //.setBandwidthMeter(meter)
+                    //.setTrackSelector(trackSelector)
+                    .setLoadControl(loadControl)
+                    .build()
+            }
+            binding?.playerView?.player = player
+            binding?.playerView?.keepScreenOn = true
+            //Initialize data source factory
+            val defaultDataSourceFactory = DefaultHttpDataSource.Factory()
+            val mediaItem2 = MediaItem.Builder()
+                .setUri(parsedUrl)
+                .setMimeType(MimeTypes.APPLICATION_M3U8)
+                .build()
+
+            //Initialize hlsMediaSource
+            val hlsMediaSource: HlsMediaSource =
+                HlsMediaSource.Factory(defaultDataSourceFactory).createMediaSource(mediaItem2)
+            val concatenatedSource = ConcatenatingMediaSource(hlsMediaSource)
+
+            val orientation = resources.configuration.orientation
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                binding?.playerView?.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+                bindingExoPlayback?.fullScreenIcon?.setImageDrawable(
+                    context?.let {
+                        ContextCompat.getDrawable(
+                            it,
+                            R.drawable.ic_full_screen
+                        )
+                    }
+                )
+                count = 1
+            } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                binding?.playerView?.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+            }
+
+            when (mLocation) {
+                PlaybackLocation.LOCAL -> {
+                    if (mCastSession != null && mCastSession?.remoteMediaClient != null) {
+                        mCastSession?.remoteMediaClient?.stop()
+                        mCastContext?.sessionManager?.endCurrentSession(true)
+                    }
+                    mPlaybackState =
+                        PlaybackState.IDLE
+
+                    if (player != null) {
+
+                        P2pEngine.getInstance()?.setPlayerInteractor(object : PlayerInteractor() {
+                            override fun onBufferedDuration(): Long {
+                                return if (player != null) {
+                                    player!!.bufferedPosition - player!!.currentPosition
+                                } else {
+                                    -1
+                                }
+                            }
+                        })
+
+                        P2pEngine.getInstance()?.registerExceptionListener(object :
+                            EngineExceptionListener {
+                            override fun onTrackerException(e: EngineException) {
+                                // Tracker Exception
+                                logger.printLog(tAG, "P2pEngine onTrackerException : ${e.cause}")
+                                logger.printLog(
+                                    tAG,
+                                    "P2pEngine onTrackerException : ${e.localizedMessage}"
+                                )
+                            }
+
+                            override fun onSignalException(e: EngineException) {
+                                // Signal Server Exception
+                                logger.printLog(tAG, "P2pEngine onSignalException : ${e.cause}")
+                                logger.printLog(
+                                    tAG,
+                                    "P2pEngine onSignalException : ${e.localizedMessage}"
+                                )
+                            }
+
+                            override fun onSchedulerException(e: EngineException) {
+                                // Scheduler Exception
+                                logger.printLog(tAG, "P2pEngine onSchedulerException : ${e.cause}")
+                                logger.printLog(
+                                    tAG,
+                                    "P2pEngine onSchedulerException : ${e.localizedMessage}"
+                                )
+                            }
+
+                            override fun onOtherException(e: EngineException) {
+                                // Other Exception
+                                logger.printLog(tAG, "P2pEngine onOtherException : ${e.cause}")
+                                logger.printLog(
+                                    tAG,
+                                    "P2pEngine onOtherException : ${e.localizedMessage}"
+                                )
+                            }
+                        })
 
 
-//    private fun setUpPlayerP2p(link: String?) {
-//        logger.printLog(
-//            tAG, "setUpPlayer P2p" + link
-//                    + " " + mLocation
-//        )
-//      //  val parsedUrl = P2pEngine.instance?.parseStreamUrl(link!!)    // Remove by Haris Abbas (p2p)
-//
-//        // Create LoadControl
-//        val loadControl: LoadControl = DefaultLoadControl.Builder()
-//            .setAllocator(DefaultAllocator(true, 16))
-//            .setBufferDurationsMs(
-//                VideoPlayerConfig.MIN_BUFFER_DURATION,
-//                VideoPlayerConfig.MAX_BUFFER_DURATION,
-//                VideoPlayerConfig.MIN_PLAYBACK_START_BUFFER,
-//                VideoPlayerConfig.MIN_PLAYBACK_RESUME_BUFFER
-//            )
-//            .setTargetBufferBytes(-1)
-//            .setPrioritizeTimeOverSizeThresholds(true)
-//            .build()
-//
-//        binding?.lottiePlayer?.visibility = View.GONE
-//
-//        val meter: BandwidthMeter = DefaultBandwidthMeter.Builder(this).build()
-//        val trackSelector: TrackSelector = DefaultTrackSelector(this)
-//        // 2. Create a default LoadControl
-//        player = null
-//        player = context?.let {
-//            ExoPlayer.Builder(it)
-//                //.setBandwidthMeter(meter)
-//                //.setTrackSelector(trackSelector)
-//                .setLoadControl(loadControl)
-//                .build()
-//        }
-//        binding?.playerView?.player = player
-//        binding?.playerView?.keepScreenOn = true
-//        //Initialize data source factory
-//        val defaultDataSourceFactory = DefaultHttpDataSource.Factory()
-//        val mediaItem2 = MediaItem.Builder()
-//         //   .setUri(parsedUrl)      // Remove by Haris Abbas (p2p)
-//            .setMimeType(MimeTypes.APPLICATION_M3U8)
-//            .build()
-//
-//        //Initialize hlsMediaSource
-//        val hlsMediaSource: HlsMediaSource =
-//            HlsMediaSource.Factory(defaultDataSourceFactory).createMediaSource(mediaItem2)
-//        val concatenatedSource = ConcatenatingMediaSource(hlsMediaSource)
-//
-//        val orientation = resources.configuration.orientation
-//        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            binding?.playerView?.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
-//            bindingExoPlayback?.fullScreenIcon?.setImageDrawable(
-//                context?.let {
-//                    ContextCompat.getDrawable(
-//                        it,
-//                        R.drawable.ic_full_screen
-//                    )
-//                }
-//            )
-//            count = 1
-//        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-//            binding?.playerView?.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
-//        }
-//
-//        when (mLocation) {
-//            PlaybackLocation.LOCAL -> {
-////                if (mCastSession != null && mCastSession?.remoteMediaClient != null) {
-////                    mCastSession?.remoteMediaClient?.stop()
-////                    mCastContext?.sessionManager?.endCurrentSession(true)
-////                }
-//                mPlaybackState =
-//                    PlaybackState.IDLE
-//
-//                if (player != null) {
-//
-//                    /*P2pEngine.instance?.setPlayerInteractor(object : PlayerInteractor() {
-//                        override fun onBufferedDuration(): Long {
-//                            return if (player != null) {
-//                                player!!.bufferedPosition - player!!.currentPosition
-//                            } else {
-//                                -1
-//                            }
-//                        }
-//                    })*/                   // Remove by Haris Abbas (p2p)
-//
-//                   /* P2pEngine.instance?.registerExceptionListener(object : EngineExceptionListener {
-//                        override fun onTrackerException(e: EngineException) {
-//                            // Tracker Exception
-//                            logger.printLog(tAG, "P2pEngine onTrackerException : ${e.cause}")
-//                            logger.printLog(
-//                                tAG,
-//                                "P2pEngine onTrackerException : ${e.localizedMessage}"
-//                            )
-//                        }
-//
-//                        override fun onSignalException(e: EngineException) {
-//                            // Signal Server Exception
-//                            logger.printLog(tAG, "P2pEngine onSignalException : ${e.cause}")
-//                            logger.printLog(
-//                                tAG,
-//                                "P2pEngine onSignalException : ${e.localizedMessage}"
-//                            )
-//                        }
-//
-//                        override fun onSchedulerException(e: EngineException) {
-//                            // Scheduler Exception
-//                            logger.printLog(tAG, "P2pEngine onSchedulerException : ${e.cause}")
-//                            logger.printLog(
-//                                tAG,
-//                                "P2pEngine onSchedulerException : ${e.localizedMessage}"
-//                            )
-//                        }
-//
-//                        override fun onOtherException(e: EngineException) {
-//                            // Other Exception
-//                            logger.printLog(tAG, "P2pEngine onOtherException : ${e.cause}")
-//                            logger.printLog(
-//                                tAG,
-//                                "P2pEngine onOtherException : ${e.localizedMessage}"
-//                            )
-//                        }
-//                    })*/       // Remove by Haris Abbas (p2p)
-//
-//
-//                    player?.addListener(this)
-//                    player?.setMediaSource(concatenatedSource)
-//                    player?.prepare()
-//                    binding?.playerView?.requestFocus()
-//                    player?.playWhenReady = true
-//                }
-//
-//            }
-//
-//            PlaybackLocation.REMOTE -> {
-//                //mCastSession?.remoteMediaClient?.play()
-//                mPlaybackState =
-//                    PlaybackState.PLAYING
-//            }
-//
-//            else -> {
-//            }
-//        }
-//    }
+                        player?.addListener(this)
+                        player?.setMediaSource(concatenatedSource)
+                        player?.prepare()
+                        binding?.playerView?.requestFocus()
+                        player?.playWhenReady = true
+                    }
+
+                }
+                PlaybackLocation.REMOTE -> {
+                    mCastSession?.remoteMediaClient?.play()
+                    mPlaybackState =
+                        PlaybackState.PLAYING
+                }
+                else -> {
+                }
+            }
+        }
+        catch (e:Exception)
+        {
+            Log.d("Exception","msg")
+        }
+
+
+    }
 
 
     private fun viewVisibility(value: Int) {
@@ -450,20 +478,56 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
 
 
     private fun initializeCastSdk() {
-        /*mCastContextTask = context?.let {
-            CastContext.getSharedInstance(it, castExecutor)
-                .addOnCompleteListener {
-                    mCastContext = mCastContextTask?.result
-                    setupCastListener()
-                    mCastContext?.sessionManager?.addSessionManagerListener(
-                        this, CastSession::class.java
-                    )
-                }
-        }*/
+        try {
+            mCastContextTask = context?.let { it ->
+                CastContext.getSharedInstance(it, castExecutor)
+                    .addOnCompleteListener {
+                        if (it.isComplete) {
+                            mCastContext = mCastContextTask?.result
+                            runOnUiThread {
+                                setupCastListener()
+                                mCastContext?.sessionManager?.addSessionManagerListener(
+                                    mSessionManagerListener!!, CastSession::class.java
+                                )
+                            }
+                        }
+                    }
+            }
+        } catch (e: Exception) {
+           Log.d("Exception","msg")
+        }
+    }
 
+
+    private fun isGooglePlayServicesAvailable(context: Context): Boolean {
+        try {
+            val googleApiAvailability = GoogleApiAvailability.getInstance()
+            val resultCode = googleApiAvailability.isGooglePlayServicesAvailable(context)
+            return resultCode == ConnectionResult.SUCCESS
+        }
+        catch (e:Exception){
+            return false
+        }
 
     }
 
+//    private fun isCastApiAvailable(): Boolean {
+//        val isCastApiAvailable = isNotTv()
+//                && GoogleApiAvailability.getInstance()
+//            .isGooglePlayServicesAvailable(this@PlayerScreen) == ConnectionResult.SUCCESS
+//        try {
+//            CastContext.getSharedInstance()
+//        } catch (e: Exception) {
+//            // track non-fatal
+//            return false
+//        }
+//        return isCastApiAvailable
+//    }
+
+    private fun isNotTv(): Boolean {
+        val uiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
+        return uiModeManager.currentModeType != Configuration.UI_MODE_TYPE_TELEVISION
+    }
 
     ////Change orientation of screen programmatically......
     private fun changeOrientation() {
@@ -490,9 +554,8 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
 
                                     }
                                 }
-                            }
-                            catch (e:Exception){
-                                Log.d("Exception","msg")
+                            } catch (e: Exception) {
+                                Log.d("Exception", "msg")
                             }
 
                         }
@@ -516,9 +579,9 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
         if (player != null) {
             player!!.release()
         }
-        /*if (P2pEngine.instance?.isConnected == true) {
-            P2pEngine.instance?.stopP2p()
-        }*/         // Remove by Haris Abbas (p2p)
+        if (P2pEngine.getInstance()?.isConnected == true) {
+            P2pEngine.getInstance()?.stopP2p()
+        }
     }
 
     ///
@@ -597,10 +660,11 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
             } else if (channel_Type.equals(userType3, true)) {
                 val token = baseUrl.let { it1 -> Defamation.improveDeprecatedCode(it1) }
                 path = baseUrl + token
-//                setUpPlayerP2p(path)
+                setUpPlayerP2p(path)
             } else {
-                path = userLinkVal
-//                setUpPlayerP2p(path)
+                val token = baseUrl.let { it1 -> Defamation.improveDeprecatedCode(it1) }
+                path = baseUrl + token
+                setUpPlayer(path)
             }
 
         } catch (e: Exception) {
@@ -613,17 +677,17 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
         setSupportActionBar(binding?.myToolbar)
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        super.onCreateOptionsMenu(menu)
-//        menuInflater.inflate(R.menu.menu, menu)
-//        mediaRouteMenuItem = CastButtonFactory.setUpMediaRouteButton(
-//            applicationContext,
-//            menu,
-//            R.id.media_route_menu_item
-//        )
-//
-//        return true
-//    }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.menu, menu)
+        mediaRouteMenuItem = CastButtonFactory.setUpMediaRouteButton(
+            applicationContext,
+            menu,
+            R.id.media_route_menu_item
+        )
+
+        return true
+    }
 
 
     ///Swipe Brightness Feature...
@@ -1151,10 +1215,10 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
 
         when (mLocation) {
             PlaybackLocation.LOCAL -> {
-//                if (mCastSession != null && mCastSession?.remoteMediaClient != null) {
-//                    mCastSession?.remoteMediaClient?.stop()
-//                    mCastContext?.sessionManager?.endCurrentSession(true)
-//                }
+                if (mCastSession != null && mCastSession?.remoteMediaClient != null) {
+                    mCastSession?.remoteMediaClient?.stop()
+                    mCastContext?.sessionManager?.endCurrentSession(true)
+                }
                 mPlaybackState =
                     PlaybackState.IDLE
 
@@ -1169,7 +1233,7 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
             }
 
             PlaybackLocation.REMOTE -> {
-                ///mCastSession?.remoteMediaClient?.play()
+                mCastSession?.remoteMediaClient?.play()
                 mPlaybackState =
                     PlaybackState.PLAYING
             }
@@ -1182,30 +1246,34 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
 
     ////Load remote media when connected with casting device
     private fun loadRemoteMedia() {
-//        if (mCastSession == null) {
-//            return
-//        }
-//        val remoteMediaClient = mCastSession!!.remoteMediaClient ?: return
-//        remoteMediaClient.registerCallback(object : RemoteMediaClient.Callback() {
-//            override fun onStatusUpdated() {
-//
-//
-//                val intent =
-//                    Intent(context, ExpendedActivity::class.java)
-//                startActivity(intent)
-//                remoteMediaClient.unregisterCallback(this)
-//            }
-//        })
-//
-//
-//        val loadData = MediaLoadRequestData.Builder()
-//            .setMediaInfo(buildMediaInfo())
-//            .build()
-//
-//        remoteMediaClient.load(loadData)
-////        buildMediaInfo()?.let { remoteMediaClient.load(loadData) }
+        if (mCastSession == null) {
+            return
+        }
+        val remoteMediaClient = mCastSession!!.remoteMediaClient ?: return
+        remoteMediaClient.registerCallback(object : RemoteMediaClient.Callback() {
+            override fun onStatusUpdated() {
+                val intent =
+                    Intent(context, ExpendedActivity::class.java)
+                startActivity(intent)
+                remoteMediaClient.unregisterCallback(this)
+            }
+        })
+
+
+        val loadData = MediaLoadRequestData.Builder()
+            .setMediaInfo(buildMediaInfo())
+            .build()
+        buildMediaInfo().let { remoteMediaClient.load(loadData) }
     }
 
+    private fun buildMediaInfo(): MediaInfo {
+        return path.let {
+            MediaInfo.Builder(it)
+                .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
+                .setContentType("application/x-mpegURL")
+                .build()
+        }
+    }
 
     override fun onPause() {
         super.onPause()
@@ -1218,51 +1286,96 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
 
     override fun onResume() {
         super.onResume()
-        hideSystemUI()
-//        if (mCastSession != null) {
-//            mCastContext?.sessionManager?.addSessionManagerListener(
-//                this, CastSession::class.java
-//            )
-//            if (mCastSession != null && mCastSession!!.isConnected) {
-//
-//                if (player != null) {
-//                    player?.playWhenReady = false
-//                    player?.release()
-//                }
-//
-//                try {
-//                    lifecycleScope.launch(Dispatchers.Main) {
-//                        if (channel_Type.equals(userType3, true)) {
-//                            lifecycleScope.launch(Dispatchers.Main) {
-//                                setUpPlayerP2p(path)
-//                            }
-//                        } else {
-//                            lifecycleScope.launch(Dispatchers.Main) {
-//                                setUpPlayer(path)
-//                            }
-//                        }
-//                    }
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                }
-//            } else {
-//
-//                updatePlaybackLocation()
-//            }
-//        } else {
-        if (player != null) {
-            if (DebugChecker.checkDebugging(this)) {
-                player?.playWhenReady = false
-                player?.stop()
+        if (InternetUtil.isPrivateDnsSetup(this)) {
+            Toast.makeText(
+                this,
+                "Please turn off private dns,If not found then search dns in setting search",
+                Toast.LENGTH_LONG
+            ).show()
+            try {
+                startActivityForResult(Intent(Settings.ACTION_SETTINGS), 0)
+            } catch (e: Exception) {
+                Log.d("Exception", "msg")
+            }
+        }
 
+        hideSystemUI()
+        if (mCastSession != null) {
+            mCastContext?.sessionManager?.addSessionManagerListener(
+                mSessionManagerListener!!, CastSession::class.java
+            )
+            if (mCastSession != null && mCastSession!!.isConnected) {
+
+                if (player != null) {
+                    player?.playWhenReady = false
+                    player?.release()
+                }
+
+                try {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        if (channel_Type.equals(userType3, true)) {
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                setUpPlayerP2p(path)
+                            }
+                        } else {
+                            lifecycleScope.launch(Dispatchers.Main) {
+                                setUpPlayer(path)
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             } else {
-                player?.playWhenReady = true
+
+                updatePlaybackLocation()
+            }
+        } else {
+            if (player != null) {
+                if (DebugChecker.checkDebugging(this)) {
+                    player?.playWhenReady = false
+                    player?.stop()
+
+                } else {
+                    player?.playWhenReady = true
+
+                }
+            }
+        }
+//      checkVpn()
+    }
+
+    private fun checkVpn() {
+        val connectivityManager =
+            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        connectivityManager?.let {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                it.getNetworkCapabilities(connectivityManager.activeNetwork)?.apply {
+                    val booleanVpnCheck = hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+                    booleanVpn = booleanVpnCheck == true
+                }
+            } else {
+                booleanVpn = false
+            }
+        }
+
+        if (booleanVpn != null) {
+            if (booleanVpn!!) {
+                if (binding?.adblockLayout?.isVisible!!) {
+                    /////////
+
+                } else {
+                    binding?.adblockLayout?.visibility = View.VISIBLE
+
+                }
+            } else {
+                binding?.adblockLayout?.visibility = View.GONE
 
             }
-            //}
         }
 
     }
+
 
 
     /////Media builder function
@@ -1319,7 +1432,7 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
                         binding?.fbAdViewTop?.let { it2 ->
                             adManager?.loadAdProvider(
                                 Constants.location2TopProvider, Constants.adLocation2top,
-                                it1, it2, binding?.unityBannerView,binding?.startAppBannerTop
+                                it1, it2, binding?.unityBannerView, binding?.startAppBannerTop
                             )
                         }
                     }
@@ -1353,49 +1466,45 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
 
     ////Listener for castSession manager
     private fun setupCastListener() {
-//        if (mSessionManagerListener == null) {
-//            mSessionManagerListener = object : SessionManagerListener<CastSession> {
-//                override fun onSessionStarting(castSession: CastSession) {
-//
-//                }
-//
-//                override fun onSessionStarted(castSession: CastSession, s: String) {
-//                    onApplicationConnected(castSession)
-//                }
-//
-//                override fun onSessionStartFailed(castSession: CastSession, i: Int) {
-////                    Log.d("player_error", "" + "failed1")
-//                    onApplicationDisconnected()
-//                }
-//
-//                override fun onSessionEnding(castSession: CastSession) {
-//
-//                }
-//
-//                override fun onSessionEnded(castSession: CastSession, i: Int) {
-//                    onApplicationDisconnected()
-////                    Log.d("player_error", "" + "failed2")
-//                }
-//
-//                override fun onSessionResuming(castSession: CastSession, s: String) {}
-//                override fun onSessionResumed(castSession: CastSession, b: Boolean) {
-//                    onApplicationConnected(castSession)
-//                }
-//
-//                override fun onSessionResumeFailed(castSession: CastSession, i: Int) {
-////                    Log.d("player_error", "" + "failed3")
-//                    onApplicationDisconnected()
-//                }
-//
-//                override fun onSessionSuspended(castSession: CastSession, i: Int) {
-//
-//                }
-//
-//
-//            }
-//        }
+        if (mSessionManagerListener == null) {
+            mSessionManagerListener = object : SessionManagerListener<CastSession> {
+                override fun onSessionStarting(castSession: CastSession) {
 
+                }
 
+                override fun onSessionStarted(castSession: CastSession, s: String) {
+                    onApplicationConnected(castSession)
+                }
+
+                override fun onSessionStartFailed(castSession: CastSession, i: Int) {
+//                    Log.d("player_error", "" + "failed1")
+                    onApplicationDisconnected()
+                }
+
+                override fun onSessionEnding(castSession: CastSession) {
+
+                }
+
+                override fun onSessionEnded(castSession: CastSession, i: Int) {
+                    onApplicationDisconnected()
+//                    Log.d("player_error", "" + "failed2")
+                }
+
+                override fun onSessionResuming(castSession: CastSession, s: String) {}
+                override fun onSessionResumed(castSession: CastSession, b: Boolean) {
+                    onApplicationConnected(castSession)
+                }
+
+                override fun onSessionResumeFailed(castSession: CastSession, i: Int) {
+//                    Log.d("player_error", "" + "failed3")
+                    onApplicationDisconnected()
+                }
+
+                override fun onSessionSuspended(castSession: CastSession, i: Int) {
+
+                }
+            }
+        }
     }
 
 
@@ -1404,19 +1513,19 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
         mLocation = PlaybackLocation.LOCAL
     }
 
-//    private fun onApplicationConnected(castSession: CastSession) {
-//        mCastSession = castSession
-//
-//        if (mPlaybackState == PlaybackState.IDLE) {
-//            if (mPlaybackState != PlaybackState.PLAYING) {
-//                loadRemoteMedia()
-//                mPlaybackState = PlaybackState.PLAYING
-//            }
-//            return
-//        }
-//
-//        invalidateOptionsMenu()
-//    }
+    private fun onApplicationConnected(castSession: CastSession) {
+        mCastSession = castSession
+
+        if (mPlaybackState == PlaybackState.IDLE) {
+            if (mPlaybackState != PlaybackState.PLAYING) {
+                loadRemoteMedia()
+                mPlaybackState = PlaybackState.PLAYING
+            }
+            return
+        }
+
+        invalidateOptionsMenu()
+    }
 
     private fun onApplicationDisconnected() {
         updatePlaybackLocation()
@@ -1450,6 +1559,9 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
     }
 
     override fun onAdFinish() {
+        if (binding?.lottiePlayer2?.isVisible == true) {
+            binding?.lottiePlayer2?.visibility = View.GONE
+        }
         Constants.videoFinish = true
         finish()
 
@@ -1493,24 +1605,24 @@ class PlayerScreen : AppCompatActivity(), Player.Listener, AdManagerListener
 //
 //    }
 
-//    object VideoPlayerConfig {
-//        //Minimum Video you want to buffer while Playing
-//        const val MIN_BUFFER_DURATION = 7000
-//
-//        //Max Video you want to buffer during PlayBack
-//        const val MAX_BUFFER_DURATION = 15000
-//
-//        //Min Video you want to buffer before start Playing it
-//        const val MIN_PLAYBACK_START_BUFFER = 7000
-//
-//        //Min video You want to buffer when user resumes video
-//        const val MIN_PLAYBACK_RESUME_BUFFER = 7000
-//    }
+    object VideoPlayerConfig {
+        //Minimum Video you want to buffer while Playing
+        const val MIN_BUFFER_DURATION = 7000
 
-    /*override fun onDetachedFromWindow() {
+        //Max Video you want to buffer during PlayBack
+        const val MAX_BUFFER_DURATION = 15000
+
+        //Min Video you want to buffer before start Playing it
+        const val MIN_PLAYBACK_START_BUFFER = 7000
+
+        //Min video You want to buffer when user resumes video
+        const val MIN_PLAYBACK_RESUME_BUFFER = 7000
+    }
+
+    override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        if (P2pEngine.instance?.isConnected == true)
-            P2pEngine.instance?.stopP2p()
-    }*/                      // Remove by Haris Abbas (p2p)
+        if (P2pEngine.getInstance()?.isConnected == true)
+            P2pEngine.getInstance()?.stopP2p()
+    }
 
 }

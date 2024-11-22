@@ -21,6 +21,8 @@
 #-renamesourcefileattribute SourceFile
 -dontshrink
 -dontoptimize
+-ignorewarnings
+
 -keep class  com.traumsportzone.live.cricket.tv.scores.streaming.models.** { *; }
 -keep class  com.traumsportzone.live.cricket.tv.scores.score.model.** { *; }
 
@@ -47,9 +49,9 @@ public static final *;
 final *;
 }
 
-
-#-dontwarn com.p2pengine.**
-#-keep class com.p2pengine.**{*;}
-#-keep interface com.p2pengine.**{*;}
-#-dontwarn org.webrtc.**
-#-keep class org.webrtc.**{*;}   // Remove by Haris Abbas (p2p)
+-dontwarn com.p2pengine.**
+-keep class com.p2pengine.**{*;}
+-keep interface com.p2pengine.**{*;}
+-keep class com.cdnbye.libdc.**{*;}
+-keep interface com.cdnbye.libdc.**{*;}
+-keep class com.snapchat.djinni.**{*;}

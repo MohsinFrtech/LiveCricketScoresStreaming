@@ -1,5 +1,7 @@
 package com.traumsportzone.live.cricket.tv.scores.score.network
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -8,11 +10,14 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import com.traumsportzone.live.cricket.tv.scores.BuildConfig
 import com.traumsportzone.live.cricket.tv.scores.score.utility.Cons.base_url_scores
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 
 object ApiServices {
-
+    private val gson: Gson = GsonBuilder()
+        .setLenient()
+        .create()
     private val moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
         .build()
@@ -45,10 +50,21 @@ object ApiServices {
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
 
     }
+    private val retrofit2: Retrofit.Builder by lazy {
+        Retrofit.Builder()
+            .baseUrl(base_url_scores)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+    }
 
 
     val retrofitService: Interfaces by lazy {
         retrofit
+            .build()
+            .create(Interfaces::class.java)
+    }
+    val retrofitService2: Interfaces by lazy {
+        retrofit2
             .build()
             .create(Interfaces::class.java)
     }

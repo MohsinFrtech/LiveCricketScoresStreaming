@@ -1,16 +1,22 @@
 package com.traumsportzone.live.cricket.tv.scores
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
+import androidx.viewpager2.widget.CompositePageTransformer
+import androidx.viewpager2.widget.MarginPageTransformer
+import androidx.viewpager2.widget.ViewPager2
+import com.facebook.ads.NativeAd
 import com.traumsportzone.live.cricket.tv.scores.databinding.FragmentEventBinding
 import com.traumsportzone.live.cricket.tv.scores.score.adapter.LiveSliderAdapterNative
 import com.traumsportzone.live.cricket.tv.scores.score.model.LiveScoresModel
@@ -24,9 +30,12 @@ import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.Navi
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.adLocation1Provider
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.checkNativeAdProvider
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.nativeAdLocation
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.nativeFacebook
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.MyNativeAd.checkNativeAd
 import com.traumsportzone.live.cricket.tv.scores.streaming.viewmodel.OneViewModel
 import com.traumsportzone.live.cricket.tv.scores.utils.InternetUtil
+import kotlin.math.abs
 
 class MainFragment : Fragment(), NavigateData, AdManagerListener {
 
@@ -43,6 +52,7 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
     private val liveViewModel by lazy {
         ViewModelProvider(requireActivity())[LiveViewModel::class.java]
     }
+    private var fbNativeAd: NativeAd? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,6 +64,7 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
         binding?.lifecycleOwner = this
         binding?.model = modelEvent
         binding?.viewModel = liveViewModel
+
 
         adManager = AdManager(requireContext(), requireActivity(), this)
 
@@ -130,6 +141,16 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
                                     )
                                 }
                             }
+                            else {
+                                binding?.adLoadLay?.visibility = View.VISIBLE
+                                binding?.nativeAdView?.let {
+                                    adManager?.loadAdmobNativeAd(
+                                        null,
+                                        it,
+                                        binding?.adLoadLay
+                                    )
+                                }
+                            }
 
                         } else if (checkNativeAdProvider.equals(Constants.facebook, true)) {
 
@@ -137,6 +158,16 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
                                 binding?.fbNativeAdContainer?.let {
                                     adManager?.inflateFbNativeAd(
                                         Cons.currentNativeAdFacebook!!, it
+                                    )
+                                }
+                            }
+                            else {
+                                fbNativeAd = NativeAd(context, nativeFacebook)
+                                binding?.adLoadLay2?.visibility = View.VISIBLE
+                                binding?.fbNativeAdContainer?.let {
+                                    adManager?.loadFacebookNativeAd(
+                                        fbNativeAd!!,
+                                        it, binding?.adLoadLay2
                                     )
                                 }
                             }
@@ -183,7 +214,16 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
                         checkNativeAdProvider =
                             adManager?.checkProvider(it.app_ads!!, Constants.nativeAdLocation)
                                 .toString()
-
+                        if (!checkNativeAdProvider.equals("none", true)) {
+                            adManager?.loadAdProvider(
+                                checkNativeAdProvider,
+                                nativeAdLocation,
+                                null,
+                                null,
+                                null,
+                                null
+                            )
+                        }
 
                         if (checkNativeAdProvider.equals(Constants.admob, true)) {
                             if (Cons.currentNativeAd != null) {
@@ -193,6 +233,15 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
                                         it
                                     )
                                 }
+                            } else {
+                                binding?.adLoadLay?.visibility = View.VISIBLE
+                                binding?.nativeAdView?.let {
+                                    adManager?.loadAdmobNativeAd(
+                                        null,
+                                        it,
+                                        binding?.adLoadLay
+                                    )
+                                }
                             }
 
                         } else if (checkNativeAdProvider.equals(Constants.facebook, true)) {
@@ -200,6 +249,15 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
                                 binding?.fbNativeAdContainer?.let {
                                     adManager?.inflateFbNativeAd(
                                         Cons.currentNativeAdFacebook!!, it
+                                    )
+                                }
+                            } else {
+                                fbNativeAd = NativeAd(context, nativeFacebook)
+                                binding?.adLoadLay2?.visibility = View.VISIBLE
+                                binding?.fbNativeAdContainer?.let {
+                                    adManager?.loadFacebookNativeAd(
+                                        fbNativeAd!!,
+                                        it, binding?.adLoadLay2
                                     )
                                 }
                             }
@@ -215,8 +273,6 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
                         adManager?.checkProvider(it.app_ads!!, Constants.nativeAdLocation)
                             .toString()
 
-
-
                     if (checkNativeAdProvider.equals(Constants.admob, true)) {
 
                         if (Cons.currentNativeAd != null) {
@@ -226,6 +282,15 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
                                     it
                                 )
                             }
+                        }else {
+                            binding?.adLoadLay?.visibility = View.VISIBLE
+                            binding?.nativeAdView?.let {
+                                adManager?.loadAdmobNativeAd(
+                                    null,
+                                    it,
+                                    binding?.adLoadLay
+                                )
+                            }
                         }
                     } else if (checkNativeAdProvider.equals(Constants.facebook, true)) {
 
@@ -233,6 +298,15 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
                             binding?.fbNativeAdContainer?.let {
                                 adManager?.inflateFbNativeAd(
                                     Cons.currentNativeAdFacebook!!, it
+                                )
+                            }
+                        } else {
+                            fbNativeAd = NativeAd(context, nativeFacebook)
+                            binding?.adLoadLay2?.visibility = View.VISIBLE
+                            binding?.fbNativeAdContainer?.let {
+                                adManager?.loadFacebookNativeAd(
+                                    fbNativeAd!!,
+                                    it, binding?.adLoadLay2
                                 )
                             }
                         }
@@ -247,12 +321,14 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
 
     private fun hideStreaming() {
         binding?.gameRecycler?.visibility = View.GONE
+        binding?.noStream?.visibility = View.VISIBLE
 //        binding?.nativeAdView?.visibility = View.VISIBLE
 //        binding?.fbNativeAdContainer?.visibility = View.VISIBLE
     }
 
     private fun showStreaming() {
         binding?.gameRecycler?.visibility = View.VISIBLE
+        binding?.noStream?.visibility = View.GONE
 //        binding?.nativeAdView?.visibility = View.GONE
 //        binding?.fbNativeAdContainer?.visibility = View.GONE
     }
@@ -294,6 +370,7 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
         }
     }
 
+
     private fun setAdapter(liveEvents: MutableList<Event>) {
         val listAdapter = context?.let {
             adManager?.let { it1 ->
@@ -311,9 +388,12 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
 
     override fun navigation(viewId: NavDirections) {
         try {
+            Constants.positionClick=-1
+            Constants.previousClick=-1
             navDirections = viewId
             if (adStatus) {
                 if (!adProviderName.equals("none", true)) {
+                    binding?.MainLottie?.visibility=View.VISIBLE
                     adManager?.showAds(adProviderName)
                 } else {
                     findNavController().navigate(viewId)
@@ -332,7 +412,9 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
     }
 
     override fun onAdFinish() {
-
+        if (binding?.MainLottie?.isVisible == true){
+            binding?.MainLottie?.visibility=View.GONE
+        }
         if (navDirections != null) {
             findNavController().navigate(navDirections!!)
         }
