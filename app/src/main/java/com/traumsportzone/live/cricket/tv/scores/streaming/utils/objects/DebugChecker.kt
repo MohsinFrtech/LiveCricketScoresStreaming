@@ -1,7 +1,9 @@
 package com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.provider.Settings
 import android.widget.Toast
 import com.traumsportzone.live.cricket.tv.scores.BuildConfig
@@ -17,12 +19,25 @@ object DebugChecker {
                     0
                 ) == 1
             ) {
-                showDialog(context)
+                if (isContextValid(context))
+                {
+                    showDialog(context)
+                }
+
                 return true
             }
         }
 
         return false
+    }
+
+    fun isContextValid(context: Context?): Boolean {
+        if (context is Activity) {
+            if (context.isFinishing || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && context.isDestroyed)) {
+                return false
+            }
+        }
+        return true
     }
 
     private fun showDialog(context: Context?) {

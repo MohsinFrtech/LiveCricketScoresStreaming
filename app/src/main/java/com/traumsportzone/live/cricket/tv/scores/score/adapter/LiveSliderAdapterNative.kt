@@ -23,6 +23,7 @@ import com.traumsportzone.live.cricket.tv.scores.streaming.adsData.AdManager
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.NavigateData
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.CodeUtils.setSafeOnClickListener
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.cas_Ai
 
 class LiveSliderAdapterNative(
     val context: Context,
@@ -115,7 +116,18 @@ class LiveSliderAdapterNative(
                             )
                         }
                     }
-                } else if (adType.equals(Constants.admob, true)) {
+                }
+                else if (adType.equals(Constants.adManagerAds, true)) {
+                    binding2?.adLoadLay?.visibility = View.VISIBLE
+                    binding2?.nativeAdView?.let {
+                        adManager.loadAdmobNativeAdWithManager(
+                            viewHolder,
+                            it,
+                            binding2?.adLoadLay
+                        )
+                    }
+                }
+                else if (adType.equals(Constants.admob, true)) {
 
                     if (Cons.currentNativeAd != null) {
                         binding2?.nativeAdView?.let {
@@ -134,6 +146,12 @@ class LiveSliderAdapterNative(
                                 binding2?.adLoadLay
                             )
                         }
+                    }
+                }
+                else if(adType.equals(cas_Ai, true)){
+                    binding2?.casAdContainer?.visibility = View.VISIBLE
+                    binding2?.casAdContainer?.let{
+                        adManager.loadNativeAdCasAi(binding2?.adLoadLay3,it)
                     }
                 }
             }
@@ -463,7 +481,6 @@ class LiveSliderAdapterNative(
                             navigateData.navigation(itemDirection2)
                         } else if (source.equals("seriesMatch", true)) {
                             if (!data.status.equals("Upcoming", true)) {
-
                                 val itemDirection2 =
                                     SeriesMatchFragmentDirections.actionSeriesMatchFragmentToLiveDetails(
                                         data

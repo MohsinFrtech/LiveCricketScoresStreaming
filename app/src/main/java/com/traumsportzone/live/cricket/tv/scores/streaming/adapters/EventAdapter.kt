@@ -15,6 +15,7 @@ import com.traumsportzone.live.cricket.tv.scores.R
 import com.traumsportzone.live.cricket.tv.scores.databinding.ItemLayoutEventsBinding
 import com.traumsportzone.live.cricket.tv.scores.streaming.adsData.AdManager
 import com.traumsportzone.live.cricket.tv.scores.streaming.models.Event
+import com.traumsportzone.live.cricket.tv.scores.streaming.ui.fragments.StreamingFragmentDirections
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.NavigateData
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.CodeUtils.setSafeOnClickListener
 
@@ -59,7 +60,7 @@ class EventAdapter(
         }
 
         holder.itemView.setSafeOnClickListener {
-            val direction = MainFragmentDirections.actionHomeToChannel(currentList[position])
+            val direction = StreamingFragmentDirections.actionStreamingFragmentToChannel(currentList[position])
             navigateData.navigation(direction)
         }
     }

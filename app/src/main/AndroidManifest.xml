@@ -84,8 +84,12 @@
             android:theme="@style/Theme.Livecricketscoresupdates">
 
         </activity>
+
+
         <activity
-            android:name=".streaming.ui.activities.PlayerScreen"
+            android:name=".streaming.ui.activities.PlayerScreenMedia3"
+            android:launchMode="singleTask"
+            android:supportsPictureInPicture="true"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
             android:theme="@style/PlayerTheme">
 
@@ -119,7 +123,7 @@
         </activity>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-5077877071835682~4246272625" />
+            android:value="ca-app-pub-3634409289872167~1505634923" />
         <activity
             android:name=".streaming.ui.activities.ExpendedActivity"
             android:exported="true"
@@ -131,10 +135,15 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".streaming.ui.activities.PlayerScreen" />
+                android:value=".streaming.ui.activities.PlayerScreenMedia3" />
         </activity>
 
-
+        <service android:name=".notifications.FirebaseService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
         <meta-data
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
             android:value="com.traumsportzone.live.cricket.tv.scores.streaming.utils.playerutils.CastOptionsProvider" />

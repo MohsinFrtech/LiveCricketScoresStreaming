@@ -6,8 +6,8 @@
 
 extern "C"
 JNIEXPORT jobjectArray JNICALL
-Java_com_traumsportzone_live_cricket_tv_scores_MainActivity_getStringArray1(JNIEnv *env,
-                                                                            jobject thiz) {
+Java_com_traumsportzone_live_cricket_tv_scores_tv_activities_TvMainActivity_getStringArray1(
+        JNIEnv *env, jobject thiz) {
     jobjectArray strarr = env->NewObjectArray(19, env->FindClass("java/lang/String"), nullptr);
     std::string vs1 = "I95JjzV16YHotJQLTw0kMD5QxKpQ5YlkQyRCyPTb";
     std::string KDa = "wnls9qbnlT4jEp2lIlLfVjtCs9PenXl7s8bL83Qy";
@@ -19,8 +19,13 @@ Java_com_traumsportzone_live_cricket_tv_scores_MainActivity_getStringArray1(JNIE
     std::string y5 = "uC1RMH0CoAMlCb2szChxpShwwzZLtk4unfzyNMja";
     std::string ikG = "v15vlGf2PbqYvlE2155wwqfzbJB9sT3jagVfVDms";
     std::string GV9 = "rsnI9vvm105AYDAYnynT5ip8OvqV8qlS1xQ4RZ5E";
-    std::string t1 = "c52bbd1b7502ed60ed06d78b8b7581546a4d816b";
-    std::string t2 = "https://score-streaming.nospacedidlove.com/api/applications/";
+//    std::string t1 = "c52bbd1b7502ed60ed06d78b8b7581546a4d816b";
+
+    std::string t1 = "201d81c0fa63460d68ef63fee05c3f303fb8ff86";
+//    std::string t2 = "https://score-streaming.nospacedidlove.com/api/applications/";
+
+    std::string t2 = "https://test.nospacedidlove.com/api/applications/";
+
     std::string t3 = "Asgjkkjhgfdswertyuimnbvcxsdfghj";
     std::string t4 = "154140573615627969442741";
     std::string t5 = "https://nodeapi.streamingsoultions.com/";
@@ -51,11 +56,10 @@ Java_com_traumsportzone_live_cricket_tv_scores_MainActivity_getStringArray1(JNIE
 
     return strarr;
 
-
 }
 extern "C"
 JNIEXPORT jobjectArray JNICALL
-Java_com_traumsportzone_live_cricket_tv_scores_tv_activities_TvMainActivity_getStringArray1(
+Java_com_traumsportzone_live_cricket_tv_scores_streaming_ui_activities_HomeScreen_getStringArray1(
         JNIEnv *env, jobject thiz) {
     jobjectArray strarr = env->NewObjectArray(19, env->FindClass("java/lang/String"), nullptr);
     std::string vs1 = "I95JjzV16YHotJQLTw0kMD5QxKpQ5YlkQyRCyPTb";
@@ -68,8 +72,11 @@ Java_com_traumsportzone_live_cricket_tv_scores_tv_activities_TvMainActivity_getS
     std::string y5 = "uC1RMH0CoAMlCb2szChxpShwwzZLtk4unfzyNMja";
     std::string ikG = "v15vlGf2PbqYvlE2155wwqfzbJB9sT3jagVfVDms";
     std::string GV9 = "rsnI9vvm105AYDAYnynT5ip8OvqV8qlS1xQ4RZ5E";
-    std::string t1 = "c52bbd1b7502ed60ed06d78b8b7581546a4d816b";
-    std::string t2 = "https://score-streaming.nospacedidlove.com/api/applications/";
+//    std::string t1 = "c52bbd1b7502ed60ed06d78b8b7581546a4d816b";
+    std::string t1 = "201d81c0fa63460d68ef63fee05c3f303fb8ff86";
+//    std::string t2 = "https://score-streaming.nospacedidlove.com/api/applications/";
+    std::string t2 = "https://test.nospacedidlove.com/api/applications/";
+
     std::string t3 = "Asgjkkjhgfdswertyuimnbvcxsdfghj";
     std::string t4 = "154140573615627969442741";
     std::string t5 = "https://nodeapi.streamingsoultions.com/";

@@ -21,11 +21,11 @@ object RetrofitController {
 
     private val client: OkHttpClient by lazy {
         val interceptor = HttpLoggingInterceptor()
-//        if (BuildConfig.DEBUG) {
-//            interceptor.level = HttpLoggingInterceptor.Level.BODY
-//        } else {
-//            interceptor.level = HttpLoggingInterceptor.Level.NONE
-//        }
+        if (BuildConfig.DEBUG) {
+            interceptor.level = HttpLoggingInterceptor.Level.BODY
+        } else {
+            interceptor.level = HttpLoggingInterceptor.Level.NONE
+        }
 
         OkHttpClient.Builder()
             .readTimeout(90, TimeUnit.SECONDS)

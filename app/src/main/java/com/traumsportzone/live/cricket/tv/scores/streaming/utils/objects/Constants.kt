@@ -1,18 +1,50 @@
 package com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects
 
+import com.cleversolutions.ads.MediationManager
+import com.futgenix.soccer.scores.models.FormatDataAudioMedia3
+import com.futgenix.soccer.scores.models.FormatDataMedia3
+import com.traumsportzone.live.cricket.tv.scores.streaming.models.FormatDataAudio
 import com.traumsportzone.live.cricket.tv.scores.BuildConfig
+import com.traumsportzone.live.cricket.tv.scores.streaming.models.FormatData
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.OnHomePressedListener
 
 
 object Constants {
+    var cas_Ai = "casAi"
+    var casAiId =""
+    var casAiAdManager: MediationManager? = null
+    var isCasAiInit = false
+    const val dash = "dash"
+    var clearKeyKey=""
+    var clearKeyId =""
+    var USER_AGENT = "ExoPlayer-Drm"
+    const val hlsSource = "hls"
+    var xForwardedKey =""
+    var mListener: OnHomePressedListener? = null
 
+    var nativeAdProvider=""
+    var positionClick2 = 0
+    var previousClick2 = -1
+    const val consentKey="Consent"
+    var playerActivityInPip=false
+    var location1Provider = "none"
+    var tapPositionProvider ="none"
+    const val tap = "Tap"
+
+    val dataFormats: MutableList<FormatData> =
+        java.util.ArrayList<FormatData>()
     //Ads
     const val unityTestMode = false
     const val admob = "admob"
+    const val adManagerAds = "admanager"
     const val facebook = "facebook"
     const val chartBoost = "chartboost"
     const val unity = "unity"
     const val startApp = "startapp"
 
+    var googleAdMangerInterstitial = ""
+    var googleAdMangerNative = ""
+    var googleAdMangerBanner = ""
     var admobInterstitial = ""
     const val adUnitId = "Interstitial_Android"
     var facebookPlacementIdInterstitial = ""
@@ -25,6 +57,8 @@ object Constants {
     var nativeFacebook = ""
     var admobBannerId = ""
     var middleAdProvider="none"
+    var locationBeforeProvider = "none"
+
     const val adLocation2topPermanent = "Location2TopPermanent"
     var location2TopPermanentProvider="none"
     var positionClick = -1
@@ -66,6 +100,7 @@ object Constants {
     const val algoTypeS1 = "SHA-1"
     const val algoTypeS2 = "SHA-256"
     const val algoName = "iso-8859-1"
+    var liveCheck = false
 
     var splash_status = false
     var app_update_dialog = false
@@ -73,8 +108,10 @@ object Constants {
     var rateUsText = ""
     var rateUsDialogValue: Boolean = false
     var rateShown=false
+    var filterValue = ""
+
     //Api data
-    const val stringId = "4"
+    const val stringId = "1"
     var authToken = ""
     const val buildNo = ""
     var passVal = ""
@@ -127,6 +164,7 @@ object Constants {
     const val t20Format = "T20"
     var selectedSeriesId = 1
 
+    var userTypePhp="php"
 
     //splash
     var updateScreenStatus = false
@@ -142,5 +180,21 @@ object Constants {
 
     const val appVersionName = BuildConfig.VERSION_NAME
     const val appVersionCode = BuildConfig.VERSION_CODE
+
+    var currentCountryCode = ""
+    var timeValueAtPlayer = 15
+    const val preferenceNoteLay="Notes"
+
+    val dataFormatsAudio: MutableList<FormatDataAudio> =
+        java.util.ArrayList<FormatDataAudio>()
+
+    var positionClick4 = 0
+    var previousClick4 = -1
+
+    val dataFormatsAudioMedia3: MutableList<FormatDataAudioMedia3> =
+        java.util.ArrayList<FormatDataAudioMedia3>()
+
+    val dataFormatsMedia3: MutableList<FormatDataMedia3> =
+        java.util.ArrayList<FormatDataMedia3>()
 
 }

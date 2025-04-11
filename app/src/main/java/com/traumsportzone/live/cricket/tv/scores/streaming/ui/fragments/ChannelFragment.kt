@@ -18,11 +18,16 @@ import com.traumsportzone.live.cricket.tv.scores.R
 import com.traumsportzone.live.cricket.tv.scores.databinding.FragmentChannelsBinding
 import com.traumsportzone.live.cricket.tv.scores.streaming.adapters.ChannelAdapter
 import com.traumsportzone.live.cricket.tv.scores.streaming.adsData.AdManager
+import com.traumsportzone.live.cricket.tv.scores.streaming.adsData.NewAdManager
 import com.traumsportzone.live.cricket.tv.scores.streaming.models.Channel
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.AppContextProvider
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.AdManagerListener
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.NavigateData
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.checkNativeAdProvider
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.currentCountryCode
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.locationAfter
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.playerActivityInPip
 import com.traumsportzone.live.cricket.tv.scores.streaming.viewmodel.OneViewModel
 import java.util.ArrayList
 
@@ -31,7 +36,6 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
     private var adManager: AdManager?=null
     private var adStatus=false
     private var navDirections: NavDirections?=null
-    private var adProviderName="none"
     private var nativeFieldVal=""
     private var listWithAd: List<Channel?> =
         ArrayList<Channel?>()
@@ -72,6 +76,8 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
 
     override fun onResume() {
         super.onResume()
+        NewAdManager.setAdManager(this)
+
         viewModel?.dataModelList?.observe(viewLifecycleOwner)
         {
             if (!it.extra_3.isNullOrEmpty()) {
@@ -79,7 +85,6 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
             }
             if (!it.app_ads.isNullOrEmpty())
             {
-                adProviderName= adManager?.checkProvider(it.app_ads!!, Constants.adBefore).toString()
                 Constants.location2TopProvider =adManager?.checkProvider(it.app_ads!!,
                     Constants.adLocation2top
                 ).toString()
@@ -90,23 +95,12 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
                     Constants.adLocation2topPermanent
                 ).toString()
                 Constants.locationAfter =adManager?.checkProvider(it.app_ads!!, Constants.adAfter).toString()
-                if (adProviderName.equals(Constants.startApp,true))
-                {
+                if (locationAfter.equals(Constants.startApp, true)) {
                     if (Constants.videoFinish) {
                         Constants.videoFinish = false
-                        adManager?.loadAdProvider(adProviderName,
-                            Constants.adBefore, null,null,null,null)
-
+                        adManager?.loadAdProvider(locationAfter, locationAfter, null, null, null, null)
                     }
                 }
-                else
-                {
-                    adManager?.loadAdProvider(adProviderName,
-                        Constants.adBefore, null,null,null,null)
-
-                }
-
-
             }
 
         }
@@ -137,11 +131,25 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
                 ArrayList<Channel>()
             for (channel in channels!!)
             {
+                var channels_belongs_country = false
+
                 if (channel.live==true)
                 {
-                    liveChannels.add(channel)
-                }
+                    if (!channel.country_codes.isNullOrEmpty()){
 
+                        channel.country_codes?.forEach {
+                            code->
+                            if (code?.equals(currentCountryCode, true) == true){
+                                channels_belongs_country = true
+                            }
+                        }
+                        if (channels_belongs_country){
+                            liveChannels.add(channel)
+                        }
+                    }else{
+                        liveChannels.add(channel)
+                    }
+                }
             }
 
             if (liveChannels.isNotEmpty())
@@ -156,7 +164,13 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
                     checkNativeAd(liveChannels)
                 } else if (checkNativeAdProvider.equals(Constants.facebook,true)) {
                     checkNativeAd(liveChannels)
-                } else {
+                }
+                else if (checkNativeAdProvider.equals(Constants.adManagerAds,true)) {
+                    checkNativeAd(liveChannels)
+                }else if (checkNativeAdProvider.equals(Constants.cas_Ai,true)) {
+                    checkNativeAd(liveChannels)
+                }
+                else {
                     liveChannels
                 }
 
@@ -184,21 +198,49 @@ class ChannelFragment: Fragment(), NavigateData, AdManagerListener {
     override fun navigation(viewId: NavDirections) {
         try {
             navDirections=viewId
-            if (adStatus)
-            {
-                if (!adProviderName.equals("none",true)) {
-                    bindingChannel?.MainLottie?.visibility=View.VISIBLE
-                    adManager?.showAds(adProviderName)
-                    requireActivity().window.setFlags(
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            if (!Constants.locationBeforeProvider.equals("none", true)) {
+                if (!Constants.locationBeforeProvider.equals(Constants.startApp,true)){
+                    if (!Constants.locationBeforeProvider.equals(Constants.unity,true))
+                    {
+                        bindingChannel?.MainLottie?.visibility = View.VISIBLE
+                        val local = AppContextProvider.getContext()
+                        local?.let {
+                            NewAdManager.showAds(
+                                Constants.locationBeforeProvider,
+                                requireActivity(),
+                                it
+                            )
+                        }
+                    }
+                    else{
+                        if (playerActivityInPip){
+                            findNavController().navigate(viewId)
+                        }
+                        else{
+                            bindingChannel?.MainLottie?.visibility = View.VISIBLE
+                            val local = AppContextProvider.getContext()
+                            local?.let {
+                                NewAdManager.showAds(
+                                    Constants.locationBeforeProvider,
+                                    requireActivity(),
+                                    it
+                                )
+                            }
+                        }
+
+                    }
+//                    requireActivity().window.setFlags(
+//                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+//                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+//                    )
                 }
-                else
-                {
+                else{
                     findNavController().navigate(viewId)
                 }
-            }
-            else {
+
+            } else {
+//                    requireActivity().getWindow()
+//                        .clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                 findNavController().navigate(viewId)
             }
         }

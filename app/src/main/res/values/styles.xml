@@ -18,4 +18,7 @@
         <item name="android:color">@color/colorPrimary</item>
         <item name="android:fontFamily">@font/raleway_medium</item>
     </style>
+    <style name="TransparentBackgroundDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:colorBackground">@android:color/transparent</item>
+    </style>
 </resources>

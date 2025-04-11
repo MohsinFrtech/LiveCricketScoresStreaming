@@ -2,15 +2,16 @@ package com.traumsportzone.live.cricket.tv.scores.streaming.adsData
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowMetrics
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.chartboost.sdk.Chartboost
 import com.chartboost.sdk.ads.Interstitial
 import com.chartboost.sdk.callbacks.InterstitialCallback
@@ -18,6 +19,21 @@ import com.chartboost.sdk.events.*
 import com.chartboost.sdk.privacy.model.CCPA
 import com.chartboost.sdk.privacy.model.COPPA
 import com.chartboost.sdk.privacy.model.GDPR
+import com.cleveradssolutions.sdk.AdContent
+import com.cleveradssolutions.sdk.nativead.CASChoicesView
+import com.cleveradssolutions.sdk.nativead.CASMediaView
+import com.cleveradssolutions.sdk.nativead.CASNativeLoader
+import com.cleveradssolutions.sdk.nativead.CASNativeView
+import com.cleveradssolutions.sdk.nativead.NativeAdContent
+import com.cleveradssolutions.sdk.nativead.NativeAdContentCallback
+import com.cleversolutions.ads.AdImpression
+import com.cleversolutions.ads.AdType
+import com.cleversolutions.ads.AdViewListener
+import com.cleversolutions.ads.Audience
+import com.cleversolutions.ads.ConsentFlow
+import com.cleversolutions.ads.MediationManager
+import com.cleversolutions.ads.android.CAS
+import com.cleversolutions.ads.android.CASBannerView
 import com.facebook.ads.*
 import com.facebook.ads.AdError
 import com.facebook.ads.AdSize
@@ -35,6 +51,7 @@ import com.startapp.sdk.adsbase.StartAppAd
 import com.startapp.sdk.adsbase.StartAppSDK
 import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener
 import com.startapp.sdk.adsbase.adlisteners.AdEventListener
+import com.traumsportzone.live.cricket.tv.scores.BuildConfig
 import com.unity3d.ads.*
 import com.unity3d.services.banners.BannerErrorInfo
 import com.unity3d.services.banners.BannerView
@@ -47,6 +64,8 @@ import com.traumsportzone.live.cricket.tv.scores.streaming.utils.Logger
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.AdManagerListener
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.admobInterstitial
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.casAiAdManager
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.googleAdMangerInterstitial
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.nativeAdmob
 
 class AdManager(
@@ -73,6 +92,7 @@ class AdManager(
     private var currentNativeAd: com.google.android.gms.ads.nativead.NativeAd? = null
     private var adProvider = ""
     private var topBannerUnity: BannerView? = null
+    private var mAdManagerInterstitialAd: AdManagerInterstitialAd? = null
 
 
     ///function will return provider
@@ -97,6 +117,12 @@ class AdManager(
                                 checkAdValue(adLocation.title, listItem.ad_key, adProvider)
                             } else if (listItem.ad_provider.equals(Constants.startApp, true)) {
                                 adProvider = Constants.startApp
+                                checkAdValue(adLocation.title, listItem.ad_key, adProvider)
+                            } else if (listItem.ad_provider.equals(Constants.adManagerAds, true)) {
+                                adProvider = Constants.adManagerAds
+                                checkAdValue(adLocation.title, listItem.ad_key, adProvider)
+                            } else if (listItem.ad_provider.equals(Constants.cas_Ai, true)) {
+                                adProvider = Constants.cas_Ai
                                 checkAdValue(adLocation.title, listItem.ad_key, adProvider)
                             }
 
@@ -142,6 +168,10 @@ class AdManager(
                 Constants.startAppId = interstitialAdValue
             } else if (provider.equals(Constants.unity, true)) {
                 Constants.unityGameID = interstitialAdValue
+            } else if (provider.equals(Constants.adManagerAds, true)) {
+                Constants.googleAdMangerInterstitial = interstitialAdValue
+            } else if (provider.equals(Constants.cas_Ai, true)) {
+                Constants.casAiId = interstitialAdValue
             }
 
         } else if (adLocation.equals(Constants.nativeAdLocation, true)) {
@@ -152,6 +182,10 @@ class AdManager(
 
             } else if (provider.equals(Constants.facebook, true)) {
                 Constants.nativeFacebook = nativeAdValue
+            } else if (provider.equals(Constants.adManagerAds, true)) {
+                Constants.googleAdMangerNative = nativeAdValue
+            } else if (provider.equals(Constants.cas_Ai, true)) {
+                Constants.casAiId = nativeAdValue
             }
 
         } else if (adLocation.equals(Constants.adLocation1, true)
@@ -169,11 +203,39 @@ class AdManager(
 
             } else if (provider.equals(Constants.startApp, true)) {
                 Constants.startAppId = bannerAdValue
-
+            } else if (provider.equals(Constants.adManagerAds, true)) {
+                Constants.googleAdMangerBanner = bannerAdValue
+            } else if (provider.equals(Constants.cas_Ai, true)) {
+                Constants.casAiId = bannerAdValue
             }
 
 
         }
+    }
+
+    private fun adMobSdkInitializationOrAdmobAdWithManager(
+        locationName: String,
+        adView: LinearLayout?,
+        linearLayout: LinearLayout?,
+        relativeLayout: RelativeLayout?,
+        banner: Banner?
+    ) {
+        if (Constants.isInitAdmobSdk) {
+            loadAdAtParticularLocation(
+                locationName,
+                Constants.adManagerAds, adView, linearLayout, relativeLayout, banner
+            )
+        } else {
+            MobileAds.initialize(context) { p0 ->
+                Constants.isInitAdmobSdk = true
+                loadAdAtParticularLocation(
+                    locationName,
+                    Constants.adManagerAds, adView, linearLayout, relativeLayout, banner
+                )
+            }
+        }
+
+
     }
 
     fun loadAdProvider(
@@ -187,6 +249,14 @@ class AdManager(
 
         if (provider.equals(Constants.admob, true)) {
             adMobSdkInitializationOrAdmobAd(
+                adLocation,
+                adView,
+                linearLayout,
+                relativeLayout,
+                startAppBanner
+            )
+        } else if (provider.equals(Constants.adManagerAds, true)) {
+            adMobSdkInitializationOrAdmobAdWithManager(
                 adLocation,
                 adView,
                 linearLayout,
@@ -220,7 +290,65 @@ class AdManager(
                 relativeLayout,
                 startAppBanner
             )
+        } else if (provider.equals(Constants.cas_Ai, true)) {
+            //Cas Ai provider Initialization.....
+            casAiSdkInitialization(
+                adLocation,
+                adView,
+                linearLayout,
+                relativeLayout,
+                startAppBanner
+            )
         }
+    }
+
+    private fun casAiSdkInitialization(
+        adLocation: String,
+        adView: LinearLayout?,
+        linearLayout: LinearLayout?,
+        relativeLayout: RelativeLayout?,
+        banner: Banner?
+    ) {
+        if (Constants.isCasAiInit) {
+            loadAdAtParticularLocation(
+                adLocation,
+                Constants.cas_Ai, adView, linearLayout, relativeLayout, banner
+            )
+        } else {
+            try {
+                //InitializeCasAiSdk....
+//                CAS.settings.debugMode = BuildConfig.DEBUG
+                CAS.settings.taggedAudience = Audience.NOT_CHILDREN
+                casAiAdManager = CAS.buildManager()
+                    .withManagerId(Constants.casAiId)
+//                    .withTestAdMode(BuildConfig.DEBUG)
+                    .withAdTypes(AdType.Banner, AdType.Interstitial, AdType.Rewarded)
+                    .withConsentFlow(
+                        ConsentFlow(isEnabled = true)
+                            .withDismissListener {
+                                Log.d(CAS_TAG, "Consent flow dismissed")
+                            }
+                    )
+                    .withCompletionListener {
+                        if (it.error == null) {
+                            Constants.isCasAiInit = true
+                            Log.d(CAS_TAG, "Ad manager initialized")
+                            loadAdAtParticularLocation(
+                                adLocation,
+                                Constants.cas_Ai, adView, linearLayout, relativeLayout, banner
+                            )
+                        } else {
+                            Constants.isCasAiInit = false
+                            Log.d(CAS_TAG, "Ad manager initialization failed: " + it.error)
+                        }
+                    }
+                    .build(context)
+            } catch (e: java.lang.Exception) {
+                Log.d("Exception", "msg")
+            }
+
+        }
+
     }
 
 
@@ -268,6 +396,80 @@ class AdManager(
 
         }
     }
+
+    var casAdView: CASNativeView?=null
+
+    var count=0
+
+    fun loadNativeAdCasAi(adLayout: ConstraintLayout?,container: CASNativeView) {
+
+        val nativeAdCallback = object : NativeAdContentCallback() {
+            override fun onNativeAdLoaded(nativeAd: NativeAdContent, ad: AdContent) {
+                Log.d("AdTypeValue","loaded")
+
+                adLayout?.visibility = View.INVISIBLE
+                registerNativeAdContent(nativeAd)
+                inflateNativeAdView(container)
+//                    container?.visibility = View.VISIBLE
+                casAdView?.let { populateNativeAdView(it) }
+
+            }
+            override fun onNativeAdFailedToLoad(error: com.cleversolutions.ads.AdError) {
+                Log.d("AdTypeValue","error"+error.message)
+
+                adLayout?.visibility = View.GONE
+                // (Optional) Handle Ad load errors
+            }
+            override fun onNativeAdFailedToShow(nativeAd: NativeAdContent, error: com.cleversolutions.ads.AdError) {
+                // (Optional) Handle Ad render errors.
+                // Called from CASNativeView.setNativeAd(nativeAd)
+            }
+            override fun onNativeAdClicked(nativeAd: NativeAdContent, ad: AdContent) {
+                // (Optional) Called when the native ad is clicked by the user.
+            }
+        }
+        val casId = Constants.casAiId
+        val adLoader = CASNativeLoader(context, casId, nativeAdCallback)
+//        adLoader.adChoicesPlacement = AdChoicesPlacement.TOP_LEFT
+        adLoader.isStartVideoMuted = true
+//        adLoader.onImpressionListener = impressionListener // optional
+
+        adLoader.load()
+    }
+
+    fun inflateNativeAdView(container: CASNativeView) {
+//        adView = CASNativeView(this)
+        val size = com.cleversolutions.ads.AdSize.MEDIUM_RECTANGLE
+        casAdView?.setAdTemplateSize(size)
+
+//        customizeAdViewAppearance(adView)
+
+        container.addView(casAdView)
+    }
+
+    fun registerNativeAdContent(nativeAd: NativeAdContent) {
+        casAdView = CASNativeView(context)
+        casAdView?.setNativeAd(nativeAd)
+    }
+
+    fun populateNativeAdView(adView: CASNativeView) {
+
+        // You can also omit adChoicesView and it will be created automatically.
+        adView.adChoicesView = adView.findViewById<CASChoicesView>(R.id.ad_choices_view)
+
+        adView.mediaView = adView.findViewById<CASMediaView>(R.id.ad_media_view)
+//        adView.adLabelView = adView.findViewById<TextView>(R.id.ad_label)
+        adView.headlineView = adView.findViewById<TextView>(R.id.ad_headline)
+        adView.iconView = adView.findViewById<ImageView>(R.id.ad_app_icon)
+//        adView.callToActionView = adView.findViewById<Button>(R.id.ad_call_to_action)
+//        adView.bodyView = adView.findViewById<TextView>(R.id.ad_body)
+//        adView.advertiserView = adView.findViewById<TextView>(R.id.ad_advertiser)
+//        adView.storeView = adView.findViewById<TextView>(R.id.ad_store)
+//        adView.priceView = adView.findViewById<TextView>(R.id.ad_price)
+//        adView.reviewCountView = adView.findViewById<TextView>(R.id.ad_review_count)
+        adView.starRatingView = adView.findViewById<View>(R.id.ad_star_rating)
+    }
+
 
     private fun setUpUnityBannerBottom(relativeLayout: RelativeLayout?) {
 
@@ -465,8 +667,46 @@ class AdManager(
         } else if (adProviderShow.equals(Constants.startApp, true)) {
 
             showStartAppAd()
+        } else if (adProviderShow.equals(Constants.adManagerAds, true)) {
+
+            showAdmobInterstitialAdx()
         }
 
+    }
+
+    private fun showAdmobInterstitialAdx() {
+        mAdManagerInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdClicked() {
+                // Called when a click is recorded for an ad.
+
+            }
+
+            override fun onAdDismissedFullScreenContent() {
+                // Called when ad is dismissed.
+                mAdManagerInterstitialAd = null
+                adManagerListener.onAdFinish()
+            }
+
+            override fun onAdFailedToShowFullScreenContent(p0: com.google.android.gms.ads.AdError) {
+                // Called when ad fails to show.
+                mAdManagerInterstitialAd = null
+                adManagerListener.onAdFinish()
+            }
+
+            override fun onAdImpression() {
+                // Called when an impression is recorded for an ad.
+            }
+
+            override fun onAdShowedFullScreenContent() {
+                // Called when ad is shown.
+            }
+        }
+        if (mAdManagerInterstitialAd != null) {
+            mAdManagerInterstitialAd?.show(activity)
+        } else {
+            adManagerListener.onAdFinish()
+            Log.d("TAG", "The interstitial ad wasn't ready yet.")
+        }
     }
 
 
@@ -526,6 +766,8 @@ class AdManager(
                 loadAdmobBanner(adView)
             } else if (adProviderName.equals(Constants.facebook, true)) {
                 loadFaceBookBannerAd(context, linearLayout)
+            } else if (adProviderName.equals(Constants.adManagerAds, true)) {
+                loadAdmobBannerAdx(adView)
             } else if (adProviderName.equals(Constants.unity, true)) {
 
                 if (locationName.equals(Constants.adLocation1, true)) {
@@ -542,6 +784,10 @@ class AdManager(
 
             } else if (adProviderName.equals(Constants.startApp, true)) {
                 setStartAppBanner(banner)
+            }
+            else if (adProviderName.equals(Constants.cas_Ai,true))
+            {
+                loadCasAiBannerAd(linearLayout)
             }
 
 
@@ -563,10 +809,220 @@ class AdManager(
                 loadFacebookInterstitialAd()
             } else if (adProviderName.equals(Constants.startApp, true)) {
                 loadStartAppAd()
+            } else if (adProviderName.equals(Constants.adManagerAds, true)) {
+                loadAdmobInterstitialAdx()
             }
 
         }
+    }
 
+    private fun loadCasAiBannerAd(linearLayout: LinearLayout?) {
+        linearLayout?.removeAllViews()
+        val adManager = casAiAdManager
+        createBanner(adManager,linearLayout)
+    }
+    private fun createBanner(manager: MediationManager?, linearLayout: LinearLayout?) {
+//        val container = findViewById<LinearLayout>(R.id.container)
+        val bannerView = CASBannerView(context, manager)
+
+        // Set required Ad size
+        bannerView.size = com.cleversolutions.ads.AdSize.getAdaptiveBannerInScreen(context)
+        //bannerView.size = AdSize.BANNER
+        //bannerView.size = AdSize.LEADERBOARD
+        //bannerView.size = AdSize.MEDIUM_RECTANGLE
+
+//        val label = findViewById<TextView>(R.id.bannerStatusText)
+        // Set Ad content listener
+        bannerView.adListener = object : AdViewListener {
+            override fun onAdViewLoaded(view: CASBannerView) {
+                linearLayout?.visibility = View.VISIBLE
+//                label.text = "Loaded"
+                Log.d(CAS_TAG, "Banner Ad loaded and ready to present")
+            }
+
+            override fun onAdViewFailed(view: CASBannerView, error: com.cleversolutions.ads.AdError) {
+//                label.text = error.message
+                linearLayout?.visibility = View.GONE
+                Log.e(CAS_TAG, "Banner Ad received error: " + error.message)
+            }
+
+            override fun onAdViewPresented(view: CASBannerView, info: AdImpression) {
+//                label.text = "Presented: " + info.network
+                Log.d(CAS_TAG, "Banner Ad presented from " + info.network)
+            }
+
+            override fun onAdViewClicked(view: CASBannerView) {
+//                label.text = "Clicked"
+                Log.d(CAS_TAG, "Banner Ad received Click action")
+            }
+        }
+
+        // Add view to container
+        linearLayout?.addView(bannerView)
+
+        // Set controls
+//        findViewById<Button>(R.id.loadBannerBtn).setOnClickListener {
+//            label.text = "Loading"
+//            bannerView.loadNextAd()
+//        }
+//
+//        findViewById<Button>(R.id.showBannerBtn).setOnClickListener {
+//            bannerView.visibility = View.VISIBLE
+//        }
+//
+//        findViewById<Button>(R.id.hideBannerBtn).setOnClickListener {
+//            bannerView.visibility = View.GONE
+//        }
+    }
+
+    fun loadAdmobNativeAdWithManager(
+        view_holder: RecyclerView.ViewHolder?, nativeAdView: NativeAdView,
+        adLayout: ConstraintLayout?
+    ) {
+        val builder = AdLoader.Builder(context, Constants.googleAdMangerNative)
+        builder.forNativeAd { nativeAd ->
+
+            currentNativeAd?.destroy()
+            currentNativeAd = nativeAd
+
+        }
+
+        val videoOptions = VideoOptions.Builder()
+            .setStartMuted(true)
+            .build()
+
+        val adOptions = NativeAdOptions.Builder()
+            .setVideoOptions(videoOptions)
+            .build()
+
+        builder.withNativeAdOptions(adOptions)
+
+        val adLoader = builder.withAdListener(object : AdListener() {
+            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                Log.d(
+                    "AdmobAdx",
+                    "native " + loadAdError.message + " " + Constants.googleAdMangerNative
+                )
+
+                logger.printLog(taG, "Admob Native $loadAdError")
+                nativeAdView.visibility = View.GONE
+                adLayout?.visibility = View.GONE
+            }
+
+            override fun onAdLoaded() {
+                if (view_holder != null) {
+                    adView = view_holder?.itemView?.findViewById(R.id.native_ad_view)
+                } else {
+                    adView = nativeAdView
+                }
+                adLayout?.visibility = View.INVISIBLE
+                android.os.Handler(Looper.getMainLooper()).postDelayed({
+                    adView?.let {
+                        currentNativeAd?.let { it1 ->
+                            populateNativeAdView(
+                                it1,
+                                it
+                            )
+                        }
+                    }
+
+                }, 100)
+            }
+        }).build()
+
+        adLoader.loadAd(AdRequest.Builder().build())
+
+    }
+
+
+    //Function to load adx interstitial....
+    private fun loadAdmobInterstitialAdx() {
+        val adRequest = AdManagerAdRequest.Builder().build()
+        AdManagerInterstitialAd.load(
+            context,
+            googleAdMangerInterstitial,
+            adRequest,
+            object : AdManagerInterstitialAdLoadCallback() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    Log.d("AdxLoaded", "error" + adError?.message)
+                    mAdManagerInterstitialAd = null
+                    adManagerListener.onAdLoad("failed")
+                }
+
+                override fun onAdLoaded(interstitialAd: AdManagerInterstitialAd) {
+                    Log.d("AdxLoaded", "loaded")
+                    mAdManagerInterstitialAd = interstitialAd
+                    adManagerListener.onAdLoad("success")
+                }
+            })
+    }
+
+    fun getSize(): com.google.android.gms.ads.AdSize {
+        val displayMetrics = context.resources.displayMetrics
+        val adWidthPixels =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val windowMetrics: WindowMetrics = activity.windowManager.currentWindowMetrics
+                windowMetrics.bounds.width()
+            } else {
+                displayMetrics.widthPixels
+            }
+        val density = displayMetrics.density
+        val adWidth = (adWidthPixels / density).toInt()
+        return com.google.android.gms.ads.AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+            context,
+            adWidth
+        )
+    }
+
+    fun loadAdmobBannerAdx(adViewLayout: LinearLayout?) {
+        val adSize = getSize()
+        val adView = AdManagerAdView(context)
+        adView.adUnitId = Constants.googleAdMangerBanner
+        adView.setAdSize(com.google.android.gms.ads.AdSize.BANNER)
+//        this.adView = adView
+        adViewLayout?.removeAllViews()
+        adViewLayout?.addView(adView)
+        // Replace ad container with new ad view.
+//        binding.adViewContainer.removeAllViews()
+//        binding.adViewContainer.addView(adView)
+
+        adView.adListener = object : AdListener() {
+            override fun onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            override fun onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                // Code to be executed when an ad request fails.
+                Log.d(
+                    "AdmobAdx",
+                    "banner " + adError?.message + " " + Constants.googleAdMangerBanner
+                )
+            }
+
+            override fun onAdImpression() {
+                // Code to be executed when an impression is recorded
+                // for an ad.
+            }
+
+            override fun onAdLoaded() {
+                Log.d("AdmobAdx", "load")
+
+                // Code to be executed when an ad finishes loading.
+            }
+
+            override fun onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+        }
+        // Start loading the ad in the background.
+        val adRequest = AdManagerAdRequest.Builder().build()
+        adView.loadAd(adRequest)
     }
 
 
@@ -1064,11 +1520,10 @@ class AdManager(
             }
 
             override fun onAdLoaded() {
-                if (view_holder!=null) {
+                if (view_holder != null) {
                     adView = view_holder?.itemView?.findViewById(R.id.native_ad_view)
-                }else
-                {
-                    adView =nativeAdView
+                } else {
+                    adView = nativeAdView
                 }
                 adLayout?.visibility = View.INVISIBLE
                 android.os.Handler(Looper.getMainLooper()).postDelayed({

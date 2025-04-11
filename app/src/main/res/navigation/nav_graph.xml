@@ -2,7 +2,16 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/home">
+    app:startDestination="@id/streaming_fragment">
+    <fragment
+        android:id="@+id/streaming_fragment"
+        android:name="com.traumsportzone.live.cricket.tv.scores.streaming.ui.fragments.StreamingFragment"
+        android:label="Streaming  Fragment"
+        tools:layout="@layout/streaming_screen">
+        <action
+            android:id="@+id/action_streaming_fragment_to_channel"
+            app:destination="@id/channel" />
+    </fragment>
 
     <fragment
         android:id="@+id/home"
@@ -45,15 +54,17 @@
             android:name="getEvent"
             app:argType="com.traumsportzone.live.cricket.tv.scores.streaming.models.Event"
             app:nullable="true" />
+
         <action
-            android:id="@+id/action_channel_to_player"
-            app:destination="@id/player" />
+            android:id="@+id/action_channel_to_player2"
+            app:destination="@id/player2" />
     </fragment>
 
 
+
     <activity
-        android:id="@+id/player"
-        android:name="com.traumsportzone.live.cricket.tv.scores.streaming.ui.activities.PlayerScreen"
+        android:id="@+id/player2"
+        android:name="com.traumsportzone.live.cricket.tv.scores.streaming.ui.activities.PlayerScreenMedia3"
         tools:layout="@layout/activity_exo_test_player"
         android:label="player Fragment">
 
@@ -72,7 +83,12 @@
             app:argType="string"
             app:nullable="true"
             android:defaultValue="abc" />
+        <argument
+            android:name="channel_time"
+            app:argType="long"
+            android:defaultValue="0L" />
     </activity>
+
     <fragment
         android:id="@+id/recentFragment"
         android:name="com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.RecentFragment"
@@ -171,6 +187,9 @@
         android:label="More Fragment"
         tools:layout="@layout/more_layout">
 
+        <action
+            android:id="@+id/action_moreFragment_to_browseFragment"
+            app:destination="@id/browseFragment" />
     </fragment>
     <fragment
         android:id="@+id/teamFragment"

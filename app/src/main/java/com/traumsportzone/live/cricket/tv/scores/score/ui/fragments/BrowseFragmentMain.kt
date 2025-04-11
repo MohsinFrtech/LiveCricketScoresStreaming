@@ -47,6 +47,9 @@ class BrowseFragmentMain : Fragment(), AdManagerListener {
             findNavController().navigate(BrowseFragmentMainDirections.actionBrowseFragmentToSeriesFragment())
         }
 
+        binding?.backLatest?.setOnClickListener {
+            findNavController()?.popBackStack()
+        }
         binding?.browseTeams?.setOnClickListener {
             findNavController().navigate(BrowseFragmentMainDirections.actionBrowseFragmentToTeamFragment())
         }

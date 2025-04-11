@@ -134,7 +134,29 @@
             android:visibility="gone">
 
         </TextView>
+        <ImageView
+            android:layout_width="@dimen/_25sdp"
+            android:layout_marginEnd="@dimen/_15sdp"
+            android:id="@+id/moreOption"
+            app:layout_constraintBottom_toBottomOf="@+id/lock_mode"
+            app:layout_constraintEnd_toStartOf="@+id/full_screen_icon"
+            android:src="@drawable/more_filled"
+            app:layout_constraintTop_toTopOf="@+id/lock_mode"
+            android:layout_height="@dimen/_30sdp"
+            app:tint="@color/white" />
 
+        <ImageView
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
+            android:id="@+id/lang"
+            android:src="@drawable/lang"
+            app:tint="@color/white"
+            app:layout_constraintTop_toTopOf="@+id/lock_mode"
+            app:layout_constraintBottom_toBottomOf="@+id/lock_mode"
+            app:layout_constraintEnd_toStartOf="@+id/moreOption"
+            android:layout_marginEnd="@dimen/_9sdp">
+
+        </ImageView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

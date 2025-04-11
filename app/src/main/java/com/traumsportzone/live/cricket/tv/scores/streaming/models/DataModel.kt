@@ -79,6 +79,11 @@ data class Channel(
     var url: String?,
     var web_image_url: String?,
     var important:Boolean?,
+    var clear_key:String?,
+    var user_agent:String?,
+    var forwarded_for:String?,
+    var initial_time:String?=null,
+    var country_codes:List<String>?=null,
     var isSelected: Boolean? = false
 ) : Parcelable
 
@@ -93,5 +98,6 @@ data class Event(
     var priority: Int?,
     var status: String?,
     var important:Boolean?=false,
+    var country_codes:List<String>?=null,
     var web_image_url: String?
 ) : Parcelable

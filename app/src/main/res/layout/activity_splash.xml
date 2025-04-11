@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
@@ -118,15 +119,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/themeCol"
-            android:visibility="gone">
+            android:visibility="gone"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="0dp">
 
             <ImageView
                 android:id="@+id/iv_icon"
                 android:layout_width="150sp"
                 android:layout_height="80sp"
+                android:layout_marginTop="@dimen/_70sdp"
                 android:contentDescription="@string/app_icon"
                 android:src="@drawable/logo"
-                android:layout_marginTop="@dimen/_70sdp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
@@ -138,6 +141,7 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/app_icon"
                 android:src="@drawable/logo"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
@@ -148,7 +152,7 @@
                 android:id="@+id/notifying"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_40sdp"
+                android:layout_marginTop="@dimen/_30sdp"
                 android:gravity="center_horizontal"
                 android:text="@string/notified"
                 android:textColor="@android:color/white"
@@ -166,10 +170,24 @@
                 android:gravity="center_horizontal"
                 android:text="@string/Allow"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/_14sdp"
+                android:textSize="@dimen/_15sdp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/notifying" />
+
+
+            <TextView
+                android:id="@+id/notifying3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:gravity="center_horizontal"
+                android:text="If you don't allow now, you can enable notifications later in Settings."
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/_12sdp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/notifying2" />
 
 
             <LinearLayout
@@ -177,7 +195,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/_40sdp"
                 android:layout_marginStart="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_30sdp"
+                android:layout_marginTop="@dimen/_20sdp"
                 android:layout_marginEnd="@dimen/_20sdp"
                 android:background="@drawable/new_dot_bg_channel"
                 android:gravity="center_horizontal"
@@ -186,7 +204,7 @@
                 android:textColor="@android:color/white"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/notifying2">
+                app:layout_constraintTop_toBottomOf="@+id/notifying3">
 
 
                 <TextView
@@ -200,19 +218,33 @@
                     android:textSize="@dimen/_12sdp" />
             </LinearLayout>
 
-
-            <TextView
+            <LinearLayout
                 android:id="@+id/skipBtn"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_marginStart="@dimen/_20sdp"
                 android:layout_marginTop="@dimen/_20sdp"
-                android:text="@string/stringValue"
+                android:layout_marginEnd="@dimen/_20sdp"
+                android:background="@drawable/new_dot_bg_channel"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                android:text="@string/skip"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/_12sdp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="@+id/yesBtn"
-                app:layout_constraintStart_toStartOf="@+id/yesBtn"
-                app:layout_constraintTop_toBottomOf="@+id/yesBtn" />
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/yesBtn">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_marginStart="@dimen/_20sdp"
+                    android:layout_marginEnd="@dimen/_20sdp"
+                    android:text="Go to Settings"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/_12sdp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

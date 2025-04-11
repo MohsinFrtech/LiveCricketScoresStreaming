@@ -19,6 +19,7 @@ import com.traumsportzone.live.cricket.tv.scores.score.adapter.CommentaryAdapter
 import com.traumsportzone.live.cricket.tv.scores.score.adapter.OverAdapter
 import com.traumsportzone.live.cricket.tv.scores.score.adapter.SquadAdapter
 import com.traumsportzone.live.cricket.tv.scores.score.model.CommentryModelClass
+import com.traumsportzone.live.cricket.tv.scores.score.model.OverItemModel
 import com.traumsportzone.live.cricket.tv.scores.score.utility.listeners.ApiResponseListener
 import com.traumsportzone.live.cricket.tv.scores.score.viewmodel.CommentaryViewModel
 
@@ -158,14 +159,40 @@ class CommentaryFragment : Fragment(), ApiResponseListener {
                         if (commentryModelClass.miniscore!!.recentOvsStats != null) {
                             val array =
                                 commentryModelClass.miniscore!!.recentOvsStats?.toCharArray()
-                            val newcharArray = ArrayList<String>()
+                            val newcharArray = ArrayList<OverItemModel>()
+                            var count = 0
+                            var scoreCount = 0
 
                             array?.forEach {
                                 if (!Character.isWhitespace(it)) {
                                     if (it != '|') {
                                         if (it != '.') {
-                                            newcharArray.add(it.toString())
-                                            Log.d("RecentOvssss", "ovs" + it)
+
+                                            if (isIntegerInRange(it)) {
+                                                val intValue =Character.getNumericValue(it)
+                                                scoreCount += intValue
+                                            }
+
+//                                            newcharArray.add(it.toString())
+//                                            Log.d("RecentOvssss", "ovs" + it)
+
+                                            if (count == "5".toInt() || count == "11".toInt()) {
+
+                                                newcharArray.add(OverItemModel(it.toString()))
+                                                newcharArray.add(OverItemModel("|  $scoreCount"))
+//                                                if (newcharArray.remove("|")){
+//                                                    scoreCount = newcharArray.sumOf { it.toInt() }
+//                                                }
+
+                                                Log.d("SumofScore", scoreCount.toString())
+                                                scoreCount =0
+                                                //  newcharArray.add("| "+scoreCount)
+                                                count++
+                                            } else {
+                                                newcharArray.add(OverItemModel(it.toString()))
+                                                Log.d("RecentOvssss", "ovs" + it)
+                                                count++
+                                            }
                                         }
                                     }
                                 }
@@ -173,8 +200,7 @@ class CommentaryFragment : Fragment(), ApiResponseListener {
                             binding?.recentOvs?.visibility = View.VISIBLE
                             binding?.rcText?.visibility = View.VISIBLE
 
-                            val listAdapter =
-                                OverAdapter(requireContext())
+                            val listAdapter = OverAdapter(requireContext(), newcharArray)
                             binding?.recentOvs?.layoutManager = LinearLayoutManager(
                                 requireContext(),
                                 LinearLayoutManager.HORIZONTAL,
@@ -182,7 +208,6 @@ class CommentaryFragment : Fragment(), ApiResponseListener {
                             )
                             binding?.recentOvs?.adapter = listAdapter
                             listAdapter.submitList(newcharArray)
-//                            binding?.recentOvs?.text = "Recent:..."+commentryModelClass.miniscore!!.recentOvsStats.toString()
                         } else {
                             binding?.recentOvs?.visibility = View.GONE
                         }
@@ -270,6 +295,11 @@ class CommentaryFragment : Fragment(), ApiResponseListener {
 
         }
     }
+
+    fun isIntegerInRange(char: Char): Boolean {
+        return char.isDigit() && char in '0'..'9'
+    }
+
 
     override fun onStarted() {
 

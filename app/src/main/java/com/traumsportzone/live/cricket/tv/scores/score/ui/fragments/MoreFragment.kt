@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.traumsportzone.live.cricket.tv.scores.R
 import com.traumsportzone.live.cricket.tv.scores.databinding.MoreLayoutBinding
 import com.traumsportzone.live.cricket.tv.scores.streaming.adsData.AdManager
@@ -188,6 +189,11 @@ class MoreFragment : Fragment(), AdManagerListener {
             startActivity(Intent.createChooser(intent, "Send Email..."))
         }
 
+        binding?.browseOption?.setOnClickListener {
+            val moreToBrowseDirection = MoreFragmentDirections.actionMoreFragmentToBrowseFragment()
+            findNavController()?.navigate(moreToBrowseDirection)
+        }
+
         ///Privacy policy layout...
         binding?.MainPrivacyPolicy?.setOnClickListener {
             try {
@@ -199,6 +205,8 @@ class MoreFragment : Fragment(), AdManagerListener {
                 logger.printLog(tags, "exception : ${e.localizedMessage}")
             }
         }
+
+
         return view
     }
 

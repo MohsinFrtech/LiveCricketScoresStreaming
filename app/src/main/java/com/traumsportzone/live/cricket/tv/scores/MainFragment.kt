@@ -24,12 +24,16 @@ import com.traumsportzone.live.cricket.tv.scores.score.utility.Cons
 import com.traumsportzone.live.cricket.tv.scores.score.viewmodel.LiveViewModel
 import com.traumsportzone.live.cricket.tv.scores.streaming.adapters.EventAdapter
 import com.traumsportzone.live.cricket.tv.scores.streaming.adsData.AdManager
+import com.traumsportzone.live.cricket.tv.scores.streaming.adsData.NewAdManager
 import com.traumsportzone.live.cricket.tv.scores.streaming.models.Event
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.AppContextProvider
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.AdManagerListener
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.NavigateData
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.adLocation1Provider
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.cas_Ai
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.checkNativeAdProvider
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.middleAdProvider
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.nativeAdLocation
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.nativeFacebook
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.MyNativeAd.checkNativeAd
@@ -44,7 +48,7 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
     private val modelEvent by lazy {
         activity?.let { ViewModelProvider(it)[OneViewModel::class.java] }
     }
-    private var adProviderName = "none"
+    private var nativeAdProviderName = "none"
     private var adManager: AdManager? = null
     private var liveChannelCount = 0
     private var navDirections: NavDirections? = null
@@ -67,6 +71,7 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
 
 
         adManager = AdManager(requireContext(), requireActivity(), this)
+        NewAdManager.setAdManager(this)
 
         if (InternetUtil.isInternetOn(requireContext())) {
 //            binding?.progressBar?.visibility=View.VISIBLE
@@ -83,6 +88,7 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
 
     override fun onResume() {
         super.onResume()
+        NewAdManager.setAdManager(this)
 
     }
 
@@ -90,9 +96,12 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
 
         // Observe Live Data for updating Data in slider
         liveViewModel.sliderList.observe(viewLifecycleOwner) {
-            if (it != null) {
-
+            if (!it.isNullOrEmpty()) {
+                binding?.noStream?.visibility = View.GONE
                 setAdapter2(it)
+            }
+            else{
+                binding?.noStream?.visibility = View.VISIBLE
             }
         }
         modelEvent?.dataModelList?.observe(viewLifecycleOwner) {
@@ -101,9 +110,6 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
             if (it.live == true) {
 
                 if (!it.events.isNullOrEmpty()) {
-
-                    Constants.middleAdProvider = "none"
-
 
                     liveChannelCount = 0
 
@@ -115,18 +121,6 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
                         checkNativeAdProvider =
                             adManager?.checkProvider(it.app_ads!!, Constants.nativeAdLocation)
                                 .toString()
-
-                        adProviderName =
-                            adManager?.checkProvider(it.app_ads!!, Constants.adMiddle).toString()
-                        Constants.middleAdProvider = adProviderName
-                        if (!adProviderName.equals(Constants.startApp, true)) {
-                            adManager?.loadAdProvider(
-                                adProviderName, Constants.adMiddle,
-                                null, null, null, null
-                            )
-
-                        }
-
 
                         adLocation1Provider =
                             adManager?.checkProvider(it.app_ads!!, Constants.adLocation1).toString()
@@ -152,7 +146,18 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
                                 }
                             }
 
-                        } else if (checkNativeAdProvider.equals(Constants.facebook, true)) {
+                        }else if (checkNativeAdProvider.equals(Constants.adManagerAds, true)) {
+                            binding?.adLoadLay?.visibility = View.VISIBLE
+                            binding?.nativeAdView?.let {
+                                adManager?.loadAdmobNativeAdWithManager(
+                                    null,
+                                    it,
+                                    binding?.adLoadLay
+                                )
+                            }
+                        }
+
+                        else if (checkNativeAdProvider.equals(Constants.facebook, true)) {
 
                             if (Cons.currentNativeAdFacebook != null) {
                                 binding?.fbNativeAdContainer?.let {
@@ -171,24 +176,54 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
                                     )
                                 }
                             }
+                        }else if(checkNativeAdProvider.equals(cas_Ai, true)){
+                            binding?.casAdContainer?.visibility = View.VISIBLE
+                            binding?.casAdContainer?.let{
+                                adManager?.loadNativeAdCasAi(binding?.adLoadLay3,it)
+                            }
                         }
 
                     }
 
-
-
                     for (event in it.events!!) {
+                        var event_belongs_country = false
                         if (event.live == true) {
-                            if (!event.channels.isNullOrEmpty()) {
+                            if (!event.country_codes.isNullOrEmpty()){
+                                event.country_codes!!.forEach {
+                                    code->
+                                    Log.d("countryCode", code)
 
-                                for (channel in event.channels!!) {
-                                    if (channel.live == true) {
-                                        liveChannelCount++
+                                    if (code?.equals(Constants.currentCountryCode, true)== true){
+                                        event_belongs_country = true
                                     }
                                 }
 
-                                if (liveChannelCount > 0) {
-                                    liveEvents.add(event)
+                                if (event_belongs_country){
+                                    if (!event.channels.isNullOrEmpty()) {
+
+                                        for (channel in event.channels!!) {
+                                            if (channel.live == true) {
+                                                liveChannelCount++
+                                            }
+                                        }
+
+                                        if (liveChannelCount > 0) {
+                                            liveEvents.add(event)
+                                        }
+                                    }
+                                }
+                            }else{
+                                if (!event.channels.isNullOrEmpty()) {
+
+                                    for (channel in event.channels!!) {
+                                        if (channel.live == true) {
+                                            liveChannelCount++
+                                        }
+                                    }
+
+                                    if (liveChannelCount > 0) {
+                                        liveEvents.add(event)
+                                    }
                                 }
                             }
                         }
@@ -310,7 +345,14 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
                                 )
                             }
                         }
-                    } else {
+                    }
+//                    else if (checkNativeAdProvider.equals(cas_Ai, true)){
+//                        binding?.nativeAdView?.let {
+//                            adManager?.loadNativeAdCasAi(binding?.a)
+//                        }
+//                    }
+
+                    else {
 
 
                     }
@@ -320,17 +362,11 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
     }
 
     private fun hideStreaming() {
-        binding?.gameRecycler?.visibility = View.GONE
-        binding?.noStream?.visibility = View.VISIBLE
-//        binding?.nativeAdView?.visibility = View.VISIBLE
-//        binding?.fbNativeAdContainer?.visibility = View.VISIBLE
+
     }
 
     private fun showStreaming() {
-        binding?.gameRecycler?.visibility = View.VISIBLE
-        binding?.noStream?.visibility = View.GONE
-//        binding?.nativeAdView?.visibility = View.GONE
-//        binding?.fbNativeAdContainer?.visibility = View.GONE
+
     }
 
 
@@ -347,13 +383,13 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
 
             val listAdapter = LiveSliderAdapterNative(
                 requireContext(), this,
-                "main", listWithAd, checkNativeAdProvider, adManager!!
+                "main", liveScores, "none", adManager!!
             )
 
             binding?.recyclerviewSlider?.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             binding?.recyclerviewSlider?.adapter = listAdapter
-            listAdapter.submitList(listWithAd)
+            listAdapter.submitList(liveScores)
 
             ////////////////////////////////////////////////
             binding?.viewDots?.attachToRecyclerView(binding!!.recyclerviewSlider)
@@ -372,36 +408,29 @@ class MainFragment : Fragment(), NavigateData, AdManagerListener {
 
 
     private fun setAdapter(liveEvents: MutableList<Event>) {
-        val listAdapter = context?.let {
-            adManager?.let { it1 ->
-                EventAdapter(
-                    it, this, liveEvents, checkNativeAdProvider,
-                    it1
-                )
-            }
-        }
-        binding?.gameRecycler?.layoutManager = LinearLayoutManager(context)
-        binding?.gameRecycler?.adapter = listAdapter
-        listAdapter?.submitList(liveEvents)
 
     }
 
     override fun navigation(viewId: NavDirections) {
         try {
+
             Constants.positionClick=-1
             Constants.previousClick=-1
             navDirections = viewId
-            if (adStatus) {
-                if (!adProviderName.equals("none", true)) {
-                    binding?.MainLottie?.visibility=View.VISIBLE
-                    adManager?.showAds(adProviderName)
-                } else {
+            if (!middleAdProvider.equals("none", true)) {
+                if (!middleAdProvider.equals(Constants.startApp,true)) {
+                    binding?.MainLottie?.visibility = View.VISIBLE
+                    val local = AppContextProvider.getContext()
+                    local?.let { NewAdManager.showAds(middleAdProvider, requireActivity(), it) }
+                }
+                else{
                     findNavController().navigate(viewId)
                 }
-            } else {
+            }
+            else{
                 findNavController().navigate(viewId)
             }
-        } catch (e: Exception) {
+        } catch (e: java.lang.Exception) {
             Log.d("Exception", "message")
         }
     }

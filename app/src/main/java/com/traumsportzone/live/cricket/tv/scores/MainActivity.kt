@@ -24,6 +24,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -34,18 +35,22 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.facebook.ads.AdSettings
 import com.getkeepsafe.relinker.ReLinker
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.traumsportzone.live.cricket.tv.scores.databinding.ActivityMainBinding
 import com.traumsportzone.live.cricket.tv.scores.score.utility.Cons.base_url_scores
 import com.traumsportzone.live.cricket.tv.scores.score.utility.Cons.s_token
 import com.traumsportzone.live.cricket.tv.scores.score.utility.Cons.socketAuth
 import com.traumsportzone.live.cricket.tv.scores.score.utility.Cons.socketUrl
+import com.traumsportzone.live.cricket.tv.scores.score.utility.listeners.ApiResponseListener
 import com.traumsportzone.live.cricket.tv.scores.score.viewmodel.LiveViewModel
 import com.traumsportzone.live.cricket.tv.scores.streaming.adsData.AdManager
 import com.traumsportzone.live.cricket.tv.scores.streaming.adsData.GoogleMobileAdsConsentManager
+import com.traumsportzone.live.cricket.tv.scores.streaming.adsData.NewAdManager
 import com.traumsportzone.live.cricket.tv.scores.streaming.date.ScreenRotation
 import com.traumsportzone.live.cricket.tv.scores.streaming.date.ScreenUtil
 import com.traumsportzone.live.cricket.tv.scores.streaming.models.ApplicationConfiguration
 import com.traumsportzone.live.cricket.tv.scores.streaming.models.DataModel
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.AppContextProvider
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.Logger
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.AdManagerListener
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.DialogListener
@@ -60,12 +65,14 @@ import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constan
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.cementMainType
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.cementType
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.emptyCheck
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.filterValue
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.passVal
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.rateShown
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.rateUsDialogValue
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.rateUsKey
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.rateUsText
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.splash_status
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.userIp
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.CustomDialogue
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Defamation
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.SharedPreference
@@ -75,58 +82,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), DialogListener,
-    NavController.OnDestinationChangedListener, AdManagerListener {
+    NavController.OnDestinationChangedListener, AdManagerListener, ApiResponseListener {
 
     private lateinit var binding: ActivityMainBinding
-    private external fun getStringArray1(): Array<String?>?
-    private external fun getStringArray2(): Array<String?>?
-    private external fun getStringArray3(): Array<String?>?
-    private external fun getStringArray4(): Array<String?>?
-    private external fun getStringArray5(): Array<String?>?
-    private external fun getStringArray6(): Array<String?>?
-    private external fun getStringArray7(): Array<String?>?
-    private external fun getStringArray8(): Array<String?>?
-    private external fun getStringArray9(): Array<String?>?
-    private external fun getStringArray10(): Array<String?>?
-    private external fun getStringArray11(): Array<String?>?
-    private external fun getStringArray12(): Array<String?>?
-    private external fun getStringArray13(): Array<String?>?
-    private external fun getStringArray14(): Array<String?>?
-    private external fun getStringArray15(): Array<String?>?
-    private external fun getStringArray16(): Array<String?>?
-    private external fun getStringArray17(): Array<String?>?
-    private external fun getStringArray18(): Array<String?>?
-    private external fun getStringArray19(): Array<String?>?
-    private external fun getStringArray20(): Array<String?>?
-    private external fun getStringArray21(): Array<String?>?
-    private external fun getStringArray22(): Array<String?>?
-    private external fun getStringArray23(): Array<String?>?
-    private external fun getStringArray24(): Array<String?>?
-    private external fun getStringArray25(): Array<String?>?
-    private external fun getStringArray26(): Array<String?>?
-    private external fun getStringArray27(): Array<String?>?
-    private external fun getStringArray28(): Array<String?>?
-    private external fun getStringArray29(): Array<String?>?
-    private external fun getStringArray30(): Array<String?>?
-    private external fun getStringArray31(): Array<String?>?
-    private external fun getStringArray32(): Array<String?>?
-    private external fun getStringArray33(): Array<String?>?
-    private external fun getStringArray34(): Array<String?>?
-    private external fun getStringArray35(): Array<String?>?
-    private external fun getStringArray36(): Array<String?>?
-    private external fun getStringArray37(): Array<String?>?
-    private external fun getStringArray38(): Array<String?>?
-    private external fun getStringArray39(): Array<String?>?
-    private external fun getStringArray40(): Array<String?>?
+
 
     var context: Context? = null
     private val tAG = "MainActivityClass"
-    private  var googleMobileAdsConsentManager: GoogleMobileAdsConsentManager?=null
 
     private val viewModel by lazy {
         ViewModelProvider(this)[OneViewModel::class.java]
     }
-    private var replaceChar = "mint"
     private val logger = Logger()
     private var navController: NavController? = null
     private var intentLink: String = ""
@@ -137,13 +103,11 @@ class MainActivity : AppCompatActivity(), DialogListener,
     }
     private var booleanVpn: Boolean? = false
 
-    private var adProviderName = "none"
     private var adManager: AdManager? = null
     private var adStatus = false
 
 
     private var preference: SharedPreference? = null
-    private val screenUtil = ScreenUtil()
 
     private var navigationTap = 0
     private var showNavigationAd = 2
@@ -151,6 +115,8 @@ class MainActivity : AppCompatActivity(), DialogListener,
     private var ratingGiven: Boolean? = false
     private var dialog: Dialog? = null
     private var dialog2: Dialog? = null
+    var navigation: BottomNavigationView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -160,17 +126,16 @@ class MainActivity : AppCompatActivity(), DialogListener,
             WindowManager.LayoutParams.FLAG_SECURE,
             WindowManager.LayoutParams.FLAG_SECURE
         )
-
+        navigation = findViewById(R.id.bottomNav)
         context = this
         setUpActionBar()
+        startDestination(Constants.liveCheck)
         preference = SharedPreference(context)
         binding.lifecycleOwner = this
         binding.modelData = viewModel
-        sliderRotation()
-
         adManager = AdManager(this, this, this)
+        viewModel?.apiResponseListener = this
 
-        AdSettings.addTestDevice("6441ff63-dc43-4773-84a1-f1dc2e9cd7ca")
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
 
@@ -187,90 +152,121 @@ class MainActivity : AppCompatActivity(), DialogListener,
                 }
             }
         })
-        showConsentDialog()
 
         binding.refreshIcon.setOnClickListener {
             liveViewModel.getsliderData()
             viewModel.onRefreshFixtures()
+            viewModel.getIP()
         }
-        setUpNavigationGraph()
+        if (Constants.liveCheck) {
+            setUpNavigationGraph()
+        } else {
+            setUpNavigationGraph2()
+        }
+
+        setUpViewModel()
+        setUpOriginal()
     }
 
+    private fun setUpOriginal() {
+        viewModel.stringValue.observe(this, Observer {
+            if (!it.isNullOrEmpty()) {
+                try {
+                    var decryptVal = ""
+                    val seperationBasedOnLetter = it?.split("_____")
 
-    private fun sliderRotation() {
-        ReLinker.loadLibrary(context, "cricket", object : ReLinker.LoadListener {
-            override fun success() {
+                    if (seperationBasedOnLetter != null) {
+                        if (seperationBasedOnLetter?.size!! > 0) {
+                            decryptVal =
+                                Defamation.convertDecData(seperationBasedOnLetter[seperationBasedOnLetter.size - 1])
+                        }
+                    }
+                    viewModel.parseDataAndNotify(seperationBasedOnLetter!![0], filterValue)
+//                    setUpViewModel()
 
-                lifecycleScope.launch(Dispatchers.Main) {
-                    val screenUtil = ScreenUtil()
-                    val numberFile = getProjectConcat(screenUtil.reMem())
-                    authToken = numberFile?.get(screenUtil.reMem2()).toString()
-                    passVal = numberFile?.get(screenUtil.reMem4()).toString()
-                    baseUrlChannel = numberFile?.get(screenUtil.reMem3()).toString()
-                    emptyCheck = numberFile?.get(screenUtil.reMem5()).toString()
-//                    baseUrlDemo = numberFile?.get(screenUtil.reMem6()).toString()
-                    base_url_scores = numberFile?.get(screenUtil.reMem7()).toString()
-                    s_token = numberFile?.get(screenUtil.reMem8()).toString()
-                    socketUrl = numberFile?.get(screenUtil.reMem9()).toString()
-                    socketAuth = numberFile?.get(screenUtil.reMem10()).toString()
 
-                    getIndexValue("chint")
-                }
-            }
-
-            override fun failure(t: Throwable) {
-                Handler(Looper.getMainLooper()).post {
-                    showFailedCppDialog()
+                } catch (e: java.lang.Exception) {
+                    viewModel.setUpError("Something is wrong with response,please retry.")
                 }
             }
         })
 
-
     }
+
 
 
     private fun setUpActionBar() {
         setSupportActionBar(binding.toolbar1)
     }
 
+    private fun startDestination(value: Boolean) {
+        try {
+            val navHostFragment =
+                supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+            val inflater = navHostFragment.navController.navInflater
+            val graph = inflater.inflate(R.navigation.nav_graph)
+            if (graph != null) {
+                if (value == true) {
+                    graph?.setStartDestination(R.id.streaming_fragment)
+//
+                } else {
+                    graph?.setStartDestination(R.id.home)
+//
+                }
+
+                val navController = navHostFragment?.navController
+                navController?.setGraph(graph, intent.extras)
+            }
+
+        } catch (e: Exception) {
+            Log.d("Exception", "msg")
+        }
+
+    }
+
     ///Navigation graph setup ......
     private fun setUpNavigationGraph() {
+        binding?.bottomNav2?.visibility = View.GONE
+        binding?.bottomNav?.visibility = View.VISIBLE
+
         val navHostFragment: NavHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         binding.bottomNav.setupWithNavController(navController!!)
         navController!!.addOnDestinationChangedListener(this)
 
-
         binding.bottomNav.setOnItemSelectedListener { item ->
             try {
                 navigationTap += 1
-
                 if (navigationTap == showNavigationAd) {
-                    //showInterAd
 
-                    if (adProviderName.equals(Constants.startApp, true)) {
-                        adManager?.loadAdProvider(
-                            adProviderName, Constants.adTap,
-                            null, null, null, null
-                        )
-                    }
-
-                    if (adStatus) {
-                        if (!adProviderName.equals("none", true)) {
-                            adManager?.showAds(adProviderName)
-
+                    if (!Constants.tapPositionProvider.equals("none", true)) {
+                        if (!Constants.tapPositionProvider.equals(Constants.startApp, true)) {
                             navigationTap = 0
                             showNavigationAd += 1
+                            val local = AppContextProvider.getContext()
+                            local?.let {
+                                NewAdManager.showAds(
+                                    Constants.tapPositionProvider,
+                                    this,
+                                    it
+                                )
+                            }
+                        } else {
+                            if (Constants.tapPositionProvider.equals(Constants.startApp, true)) {
+                                adManager?.loadAdProvider(
+                                    Constants.tapPositionProvider,
+                                    Constants.tap, null, null, null, null
+                                )
+                            }
                         }
-
                     } else {
                         navigationTap = 0
                     }
-
+                    //showInterAd
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            } catch (e: java.lang.Exception) {
+                Log.d("Exception", "msg")
             }
 
             if (item.itemId != navController!!.currentDestination?.id) {
@@ -279,271 +275,84 @@ class MainActivity : AppCompatActivity(), DialogListener,
 
             false
         }
+    }
 
+
+    private fun setUpNavigationGraph2() {
+        binding?.bottomNav2?.visibility = View.VISIBLE
+        binding?.bottomNav?.visibility = View.GONE
+
+        val navHostFragment: NavHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+        binding.bottomNav2.setupWithNavController(navController!!)
+        navController!!.addOnDestinationChangedListener(this)
+
+        binding.bottomNav2.setOnItemSelectedListener { item ->
+            try {
+                navigationTap += 1
+                if (navigationTap == showNavigationAd) {
+
+                    if (!Constants.tapPositionProvider.equals("none", true)) {
+                        if (!Constants.tapPositionProvider.equals(Constants.startApp, true)) {
+                            navigationTap = 0
+                            showNavigationAd += 1
+                            val local = AppContextProvider.getContext()
+                            local?.let {
+                                NewAdManager.showAds(
+                                    Constants.tapPositionProvider,
+                                    this,
+                                    it
+                                )
+                            }
+                        } else {
+                            if (Constants.tapPositionProvider.equals(Constants.startApp, true)) {
+                                adManager?.loadAdProvider(
+                                    Constants.tapPositionProvider,
+                                    Constants.tap, null, null, null, null
+                                )
+                            }
+                        }
+                    } else {
+                        navigationTap = 0
+                    }
+                    //showInterAd
+                }
+            } catch (e: java.lang.Exception) {
+                Log.d("Exception", "msg")
+            }
+
+            if (item.itemId != navController!!.currentDestination?.id) {
+                NavigationUI.onNavDestinationSelected(item, navController!!)
+            }
+
+            false
+        }
     }
 
     private fun loadTapAd() {
         //interstitial Ad loading
-        if (!adProviderName.equals(Constants.startApp, true)) {
-            adManager?.loadAdProvider(
-                adProviderName, Constants.adTap,
-                null, null, null, null
-            )
-        }
 
     }
 
-    private fun getProjectConcat(x: Int): Array<String?>? {
-        return when (x) {
-            1 -> {
-                getStringArray1()
-            }
-
-            2 -> {
-                getStringArray2()
-            }
-
-            3 -> {
-                getStringArray3()
-            }
-
-            4 -> {
-                getStringArray4()
-            }
-
-            5 -> {
-                getStringArray5()
-            }
-
-            6 -> {
-                getStringArray6()
-            }
-
-            7 -> {
-                getStringArray7()
-            }
-
-            8 -> {
-                getStringArray8()
-            }
-
-            9 -> {
-                getStringArray9()
-            }
-
-            10 -> {
-                getStringArray10()
-            }
-
-            11 -> {
-                getStringArray11()
-            }
-
-            12 -> {
-                getStringArray12()
-            }
-
-            13 -> {
-                getStringArray13()
-            }
-
-            14 -> {
-                getStringArray14()
-            }
-
-            15 -> {
-                getStringArray15()
-            }
-
-            16 -> {
-                getStringArray16()
-            }
-
-            17 -> {
-                getStringArray17()
-            }
-
-            18 -> {
-                getStringArray18()
-            }
-
-            19 -> {
-                getStringArray19()
-            }
-
-            20 -> {
-                getStringArray20()
-            }
-
-            21 -> {
-                getStringArray21()
-            }
-
-            22 -> {
-                getStringArray22()
-            }
-
-            23 -> {
-                getStringArray23()
-            }
-
-            24 -> {
-                getStringArray24()
-            }
-
-            25 -> {
-                getStringArray25()
-            }
-
-            26 -> {
-                getStringArray26()
-            }
-
-            27 -> {
-                getStringArray27()
-            }
-
-            28 -> {
-                getStringArray28()
-            }
-
-            29 -> {
-                getStringArray29()
-            }
-
-            30 -> {
-                getStringArray30()
-            }
-
-            31 -> {
-                getStringArray31()
-            }
-
-            32 -> {
-                getStringArray32()
-            }
-
-            33 -> {
-                getStringArray33()
-            }
-
-            34 -> {
-                getStringArray34()
-            }
-
-            35 -> {
-                getStringArray35()
-            }
-
-            36 -> {
-                getStringArray36()
-            }
-
-            37 -> {
-                getStringArray37()
-            }
-
-            38 -> {
-                getStringArray38()
-            }
-
-            39 -> {
-                getStringArray39()
-            }
-
-            40 -> {
-                getStringArray40()
-            }
-
-            else -> {
-                return null
-            }
-        }
-    }
-
-    private fun showFailedCppDialog() {
-        CustomDialogue(this).showDialog(
-            this, "title", getString(R.string.cpp_file_error),
-            "", "Exit", "eventValue"
-        )
-    }
-
-    private fun getIndexValue(fitX: String) {
-        try {
-            var ml1 = ""
-            var xLimit = 40
-            var sendValue = "tpcidfg&%45"
-            sendValue = if (replaceChar.equals("mint", true)) {
-                val tripleVal = sendValue
-                emptyCheck
-            } else {
-                fitX
-            }
-
-            getApiBaseUrl(replaceChar)
-
-
-            val (array1, array2, array3) = screenUtil.dateFunction(sendValue)
-            val sizeMain = screenUtil.returnValueOfSize()
-            for (x in array3.indices) {
-
-                var final = xLimit.minus(array3[x].toInt())
-                if (final > 0) {
-                    ///
-                } else {
-                    final = 40
-                }
-
-                val numberFile = getProjectConcat(final)
-                if (array2[x].toInt() in 0..9) {
-
-                    val indexValue = numberFile?.get(array2[x].toInt())
-                    val finalVal = indexValue?.toCharArray()?.get(array1[x].toInt())
-                    xLimit = final
-                    ml1 += StringBuilder().append(finalVal).toString()
-                }
-
-
-            }
-
-            if (replaceChar.equals("mint", true)) {
-                passVal = ml1
-                getStoneValues()
-            } else {
-
-                val getFileNumberAt2nd = getProjectConcat(sizeMain)
-                val rotation = ScreenRotation()
-                rotation.templateFile(ml1, sizeMain, getFileNumberAt2nd)
-            }
-
-
-        } catch (e: Exception) {
-            logger.printLog(tAG, "message" + e.message)
-        }
-
-
-    }
-
-    private fun getStoneValues() {
-        try {
-            setUpViewModel()
-        } catch (e: Exception) {
-            logger.printLog("Exception", "" + e.message)
-        }
-    }
 
     private fun setUpViewModel() {
-        cementData = authToken
-        authToken = "bfhwebfefbhbefjk"
-        cementType = cementData
-        cementData = "hb87y87y7"
-
-        cementMainData = baseUrlChannel
-        baseUrlChannel = "https://play.google.com/store/apps"
-        cementMainType = cementMainData
-        cementMainData = "https://play.google.com/store/apps/details"
-        viewModel.getApiData()
-
+        try {
+            val myParcelable: DataModel? =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra("data", DataModel::class.java)
+                } else {
+                    intent.getParcelableExtra("data")
+                }
+            if (myParcelable != null) {
+                viewModel.setUpMainData(myParcelable)
+            } else {
+                viewModel.setUpError("Something went wrong,please retry.")
+            }
+        } catch (e: java.lang.Exception) {
+            viewModel.setUpError("Something went wrong,please retry.")
+            Log.d("Exception", "null")
+        }
         if (s_token.isNotEmpty() && base_url_scores.isNotEmpty()) {
             liveViewModel.getsliderData()
         }
@@ -553,6 +362,20 @@ class MainActivity : AppCompatActivity(), DialogListener,
                 binding.lottieHome.visibility = View.VISIBLE
             } else {
                 binding.lottieHome.visibility = View.GONE
+            }
+        }
+
+
+
+        if (userIp.contains("userIp")) {
+            viewModel?.getIP()
+
+            viewModel.isLoadingIpApi.observe(this) {
+                if (it) {
+                    binding.lottieHome.visibility = View.GONE
+                } else {
+                    binding.lottieHome.visibility = View.VISIBLE
+                }
             }
 
         }
@@ -565,27 +388,8 @@ class MainActivity : AppCompatActivity(), DialogListener,
 //            }
 //        }
 
-        viewModel.isInternet.observe(this)
-        {
-            if (!it) {
-
-                CustomDialogue(this).showDialog(
-                    this, "Alert", getString(R.string.againVal),
-                    "Retry", "Exit", "isInternet"
-                )
-            }
-
-        }
-
         viewModel.dataModelList.observe(this)
         {
-
-            if (!it.extra_2.isNullOrEmpty()) {
-                replaceChar = "goi"
-
-                getIndexValue(it.extra_2!!)
-            }
-
             if (!it.app_version.isNullOrEmpty()) {
                 try {
                     val version = appVersionCode
@@ -615,18 +419,37 @@ class MainActivity : AppCompatActivity(), DialogListener,
             }
 
             if (!it.app_ads.isNullOrEmpty()) {
-                adProviderName =
-                    adManager?.checkProvider(it.app_ads!!, Constants.adTap).toString()
-
+                val context = AppContextProvider.getContext()
+                if (!Constants.tapPositionProvider.equals("none", true)) {
+                    if (context != null) {
+                        if (!Constants.tapPositionProvider.equals(Constants.startApp, true)) {
+                            NewAdManager.loadAdProvider(
+                                Constants.tapPositionProvider, Constants.tap,
+                                null, null, null, null,
+                                context, this
+                            )
+                        }
+                    }
+                }
 
                 //for more screen
                 adMoreProvider =
                     adManager?.checkProvider(it.app_ads!!, Constants.adMore).toString()
+                val bannerProvider =
+                    adManager?.checkProvider(it.app_ads!!, Constants.adLocation1)
 
-                if (adProviderName != "none") {
-                    //interstitial Ad loading
-                    loadTapAd()
+                if (bannerProvider != null) {
+                    Constants.adLocation1Provider = bannerProvider
                 }
+
+                if (bannerProvider != null) {
+
+                    adManager?.loadAdProvider(
+                        bannerProvider, Constants.adLocation1, binding?.adView,
+                        binding?.fbAdView, binding?.unityBannerView, binding?.startAppBanner
+                    )
+                }
+
             }
 
         }
@@ -786,23 +609,24 @@ class MainActivity : AppCompatActivity(), DialogListener,
         }
 
     }
+
     private fun showConsentDialog() {
-        googleMobileAdsConsentManager = GoogleMobileAdsConsentManager.getInstance(this)
-        googleMobileAdsConsentManager?.gatherConsent(this) { consentError ->
-            if (consentError != null) {
-                // Consent not obtained in current session.
-                Log.d("ConsetDialog", "${consentError.errorCode}: ${consentError.message}")
-            }
-
-
-//            if (googleMobileAdsConsentManager?.canRequestAds == true) {
-////                initializeMobileAdsSdk()
+//        googleMobileAdsConsentManager = GoogleMobileAdsConsentManager.getInstance(this)
+//        googleMobileAdsConsentManager?.gatherConsent(this) { consentError ->
+//            if (consentError != null) {
+//                // Consent not obtained in current session.
+//                Log.d("ConsetDialog", "${consentError.errorCode}: ${consentError.message}")
 //            }
-//            if (googleMobileAdsConsentManager?.isPrivacyOptionsRequired == true) {
-//                // Regenerate the options menu to include a privacy setting.
-//                invalidateOptionsMenu()
-//            }
-        }
+//
+//
+////            if (googleMobileAdsConsentManager?.canRequestAds == true) {
+//////                initializeMobileAdsSdk()
+////            }
+////            if (googleMobileAdsConsentManager?.isPrivacyOptionsRequired == true) {
+////                // Regenerate the options menu to include a privacy setting.
+////                invalidateOptionsMenu()
+////            }
+//        }
     }
 
     private fun showAppUpdateDialog(appUpdateText: String?, permanent: Boolean?) {
@@ -882,9 +706,8 @@ class MainActivity : AppCompatActivity(), DialogListener,
                 } else {
                     Log.d("Exceptionnnnn", "msg")
                 }
-            }
-            catch (e:SecurityException){
-                Log.d("Exception","msg")
+            } catch (e: SecurityException) {
+                Log.d("Exception", "msg")
             }
 
             preference?.saveRateUsBool(rateUsKey, true)
@@ -930,33 +753,61 @@ class MainActivity : AppCompatActivity(), DialogListener,
         destination: NavDestination,
         arguments: Bundle?
     ) {
-        if (destination.id == R.id.home || destination.id == R.id.recentFragment
-            ||destination.id == R.id.upcomingFragment || destination.id == R.id.browseFragment
-            ||destination.id == R.id.moreFragment){
-            binding?.bottomNav?.visibility =View.VISIBLE
+
+        if (Constants.liveCheck == true) {
+            if (destination.id == R.id.home || destination.id == R.id.recentFragment
+                || destination.id == R.id.upcomingFragment || destination.id == R.id.browseFragment
+                || destination.id == R.id.moreFragment
+                || destination.id == R.id.streaming_fragment
+            ) {
+                binding?.bottomNav?.visibility = View.VISIBLE
+            } else {
+                binding?.bottomNav?.visibility = View.GONE
+            }
+        } else {
+            if (destination.id == R.id.home || destination.id == R.id.recentFragment
+                || destination.id == R.id.upcomingFragment || destination.id == R.id.browseFragment
+                || destination.id == R.id.moreFragment
+            ) {
+                binding?.bottomNav2?.visibility = View.VISIBLE
+            } else {
+                binding?.bottomNav2?.visibility = View.GONE
+            }
         }
-        else{
-            binding?.bottomNav?.visibility=View.GONE
+
+
+        /////////
+        if (Constants.liveCheck == false) {
+            if (destination.id == R.id.home) {
+                backBoolean = true
+            } else {
+                backBoolean = false
+            }
+        } else {
+            backBoolean = destination.id == R.id.streaming_fragment
         }
         when (destination.id) {
             R.id.home -> {
-                backBoolean = true
+//                backBoolean = true
+                binding.mainFit.visibility = View.VISIBLE
+            }
+
+            R.id.streaming_fragment -> {
+//                backBoolean = true
                 binding.mainFit.visibility = View.VISIBLE
             }
 
             R.id.channel -> {
-                backBoolean = false
+//                backBoolean = false
                 binding.mainFit.visibility = View.GONE
             }
 
             else -> {
-                backBoolean = false
+//                backBoolean = false
                 binding.mainFit.visibility = View.GONE
 //                binding.bottomNav.visibility = View.VISIBLE
             }
         }
-
-
     }
 
     override fun onAdLoad(value: String) {
@@ -967,9 +818,6 @@ class MainActivity : AppCompatActivity(), DialogListener,
     override fun onAdFinish() {
         adStatus = false
 
-        if (adProviderName != "none") {
-            loadTapAd()
-        }
     }
 
     override fun onPause() {
@@ -980,9 +828,7 @@ class MainActivity : AppCompatActivity(), DialogListener,
     override fun onDestroy() {
         super.onDestroy()
         liveViewModel.stopWebSocket()
-        splash_status = false
-        rateShown = false
-        Constants.app_update_dialog = false
+
     }
 
     override fun onResume() {
@@ -1018,7 +864,6 @@ class MainActivity : AppCompatActivity(), DialogListener,
         } else {
             ratingGiven = false
         }
-
 //        checkVpn()
     }
 
@@ -1051,6 +896,28 @@ class MainActivity : AppCompatActivity(), DialogListener,
             }
         }
 
+    }
+
+    override fun onStarted() {
+
+    }
+
+    override fun onSuccess() {
+
+    }
+
+    override fun onFailure(message: String) {
+        if (!isFinishing) {
+            try {
+                CustomDialogue(this).showDialog(
+                    this, "Alert", message,
+                    "Retry", "Exit", "isInternet"
+                )
+            } catch (e: WindowManager.BadTokenException) {
+                Log.d("Exception", "msg")
+            }
+
+        }
     }
 
 

@@ -8,7 +8,7 @@
 
 extern "C"
 JNIEXPORT jobjectArray JNICALL
-Java_com_traumsportzone_live_cricket_tv_scores_MainActivity_getStringArray33(JNIEnv *env,
+Java_com_traumsportzone_live_cricket_tv_scores_streaming_ui_activities_HomeScreen_getStringArray33(JNIEnv *env,
                                                                                    jobject thiz) {
     jobjectArray strarr = env->NewObjectArray(10, env->FindClass("java/lang/String"), nullptr);
     std::string LgJ = "Z!l5b&&&ZYE!eWxc2un6!pGRce@7uD3lvFTgkove";	env->SetObjectArrayElement(strarr, 0, env->NewStringUTF(LgJ.c_str()));

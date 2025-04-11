@@ -75,10 +75,7 @@ class RecentMatchesFragment : Fragment(), NavigateData, AdManagerListener {
 
         recentViewModel.isTabSelect.observe(viewLifecycleOwner)
         {
-
-
             showFilteredList(it)
-
         }
     }
 

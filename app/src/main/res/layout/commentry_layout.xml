@@ -8,43 +8,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <TextView
-            android:layout_width="wrap_content"
-            android:text="Squads:"
-            android:textStyle="bold"
-            android:textColor="@color/white"
-            android:layout_marginEnd="@dimen/_10sdp"
-            android:id="@+id/overNumber"
-            android:visibility="gone"
-            app:layout_constraintEnd_toStartOf="@+id/squads"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:textSize="@dimen/_12sdp"
-            android:layout_marginTop="@dimen/_10sdp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_height="wrap_content">
 
-        </TextView>
-        <TextView
-            android:layout_width="0sp"
-            android:text="Squads:"
-            android:textColor="@color/white"
-            android:layout_marginEnd="@dimen/_10sdp"
-            android:id="@+id/squads"
-            android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:textSize="@dimen/_11sdp"
-            android:layout_marginTop="@dimen/_10sdp"
-            app:layout_constraintStart_toEndOf="@+id/overNumber"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_height="wrap_content">
-
-        </TextView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            app:layout_constraintTop_toBottomOf="@+id/squads"
+            app:layout_constraintTop_toTopOf="parent"
             android:padding="5dp"
             android:visibility="gone"
             android:layout_marginTop="@dimen/_10sdp"
@@ -245,7 +213,39 @@
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="Squads:"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:id="@+id/overNumber"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/squads"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:textSize="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mainBatsmanHead"
+            android:layout_height="wrap_content">
 
+        </TextView>
+        <TextView
+            android:layout_width="0sp"
+            android:text="Squads:"
+            android:textColor="@color/white"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:id="@+id/squads"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:textSize="@dimen/_11sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            app:layout_constraintStart_toEndOf="@+id/overNumber"
+            app:layout_constraintTop_toBottomOf="@+id/mainBatsmanHead"
+            android:layout_height="wrap_content">
+
+        </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
