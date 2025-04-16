@@ -32,6 +32,10 @@
 -verbose
 
 -keepattributes Annotation,Signature,EnclosingMethod
+-dontwarn kotlin.Unit
+
+-dontwarn retrofit2.KotlinExtensions
+-dontwarn retrofit2.KotlinExtensions$*
 
 -keepclassmembers class com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants {
 public static final *;

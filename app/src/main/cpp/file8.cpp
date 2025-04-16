@@ -25,11 +25,11 @@ Java_com_traumsportzone_live_cricket_tv_scores_streaming_ui_activities_HomeScree
     env->SetObjectArrayElement(strarr, 5, env->NewStringUTF(Lw.c_str()));
     std::string qGZ = "o9QDM8PRFT@w!SG8WnUW1sm0Y78tst5pkWy#yPr7";
     env->SetObjectArrayElement(strarr, 6, env->NewStringUTF(qGZ.c_str()));
-    std::string pi6 = "jEHdHJfjIPk!IAGRjvWerSOZ@uXQPh8Da!MKdYkn";
+    std::string pi6 = "76a8q1N7reJY7A3Kl9GdeCPgAFNakXaghqu030j5";
     env->SetObjectArrayElement(strarr, 7, env->NewStringUTF(pi6.c_str()));
     std::string uHG = "#5QzeqIOWYcfSuM5Vd1ilrXurq6lpPnSc@pmjTvN";
     env->SetObjectArrayElement(strarr, 8, env->NewStringUTF(uHG.c_str()));
-    std::string OhD = "XVT3DeP3gvcPOfpke588Rlu@P0SMXjr&1$77KAOY";
+    std::string OhD = "eNeCMnRTdu87Sh5BdoCbj6rf7AZGBldEXIQT1vLg";
     env->SetObjectArrayElement(strarr, 9, env->NewStringUTF(OhD.c_str()));
 
     return strarr;
@@ -53,11 +53,11 @@ Java_com_traumsportzone_live_cricket_tv_scores_tv_activities_TvMainActivity_getS
     env->SetObjectArrayElement(strarr, 5, env->NewStringUTF(Lw.c_str()));
     std::string qGZ = "o9QDM8PRFT@w!SG8WnUW1sm0Y78tst5pkWy#yPr7";
     env->SetObjectArrayElement(strarr, 6, env->NewStringUTF(qGZ.c_str()));
-    std::string pi6 = "jEHdHJfjIPk!IAGRjvWerSOZ@uXQPh8Da!MKdYkn";
+    std::string pi6 = "76a8q1N7reJY7A3Kl9GdeCPgAFNakXaghqu030j5";
     env->SetObjectArrayElement(strarr, 7, env->NewStringUTF(pi6.c_str()));
     std::string uHG = "#5QzeqIOWYcfSuM5Vd1ilrXurq6lpPnSc@pmjTvN";
     env->SetObjectArrayElement(strarr, 8, env->NewStringUTF(uHG.c_str()));
-    std::string OhD = "XVT3DeP3gvcPOfpke588Rlu@P0SMXjr&1$77KAOY";
+    std::string OhD = "eNeCMnRTdu87Sh5BdoCbj6rf7AZGBldEXIQT1vLg";
     env->SetObjectArrayElement(strarr, 9, env->NewStringUTF(OhD.c_str()));
 
     return strarr;

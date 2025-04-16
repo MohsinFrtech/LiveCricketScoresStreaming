@@ -455,6 +455,8 @@ class HomeScreen : AppCompatActivity(), DialogListener, ApiResponseListener {
         try {
             var ml1 = ""
             var xLimit = 40
+            var addValue =0
+
             var sendValue = "tpcidfg&%45"
             sendValue = if (replaceChar.equals("mint", true)) {
                 val tripleVal = sendValue
@@ -467,42 +469,34 @@ class HomeScreen : AppCompatActivity(), DialogListener, ApiResponseListener {
             val (array1, array2, array3) = screenUtil.dateFunction(sendValue.trim())
             val sizeMain = screenUtil.returnValueOfSize()
             for (x in array3.indices) {
+                addValue = addValue+2
 
-//                var final = xLimit.minus(array3[x].toInt())
-                var final= array3[x].toInt()
-                if (final >= 0){
-                    if (final % 2 ==0){
-                        final = (20 - final)
-                    }
-                    else if (final %3==0){
-                        final = (30 - final)
-                    }
-                    else if (final % 5 ==0){
-                        final = (40 - final)
-                    }
-                    else{
-                        final = (10 - final)
-                    }
-                }
-                ///////////
-
+                var final= array2[x].toInt()
                 if (final>0)
                 {
                     ///
                 }
                 else
                 {
-                    final=40
+                    final=10
                 }
 
+                ///////////
                 val numberFile = getProjectConcat(final)
-                if (array2[x].toInt() in 0..9) {
+                if (array3[x].toInt() in 0..9) {
+                    val indexValue= numberFile?.get(array3[x].toInt())
+                    var finalX = addValue + array1[x].toInt()
 
-                    val indexValue = numberFile?.get(array2[x].toInt())
-                    val finalVal = indexValue?.toCharArray()?.get(array1[x].toInt())
-                    xLimit = final
-                    ml1 += StringBuilder().append(finalVal).toString()
+                    if (finalX in 0..39)
+                    {
+
+                        val finalVal=indexValue?.toCharArray()?.get(finalX)
+                        xLimit =final
+                        ml1 += StringBuilder().append(finalVal).toString()
+                    }
                 }
+
+
             }
 
             if (replaceChar.equals("mint", true)) {
@@ -581,29 +575,41 @@ class HomeScreen : AppCompatActivity(), DialogListener, ApiResponseListener {
             var ml1 = ""
             var xLimit = 40
             var sendValue = fitX
+            var addValue =0
 
             val (array1, array2, array3) = screenUtil.dateFunction(sendValue)
             val sizeMain = screenUtil.returnValueOfSize()
 
-            for (a1 in array1.indices) {
+            for (a1 in array3.indices) {
 
                 val fileNumber = array1[a1]
                 val stringToPick = array1[a1]
+                addValue += 3
 
-                if (fileNumber.toInt() in 1..39) {
+                if (fileNumber.toInt() in 1..39){
 
                     if (stringToPick.toInt() in 0..9) {
 
                         if (array3[a1].toInt() in 0..9) {
+                            var finalX = addValue + array3[a1].toInt()
                             val numberFile = getProjectConcat(fileNumber.toInt())
                             val indexValueWithInFile = numberFile?.get(stringToPick.toInt())
-                            val finalVal =
-                                indexValueWithInFile?.toCharArray()?.get(array3[a1].toInt())
-                            ml1 += StringBuilder().append(finalVal).toString()
+                            if (finalX in 0..39) {
+//                                Log.d(
+//                                    "ValueCheckerrr", "check" + array3[a1] + " " + addValue + " "
+//                                            + finalX
+//                                )
+                                val finalVal = indexValueWithInFile?.toCharArray()?.get(finalX)
+                                ml1 += StringBuilder().append(finalVal).toString()
+                            }
+
                         }
+
                     }
+
                 }
             }
+
 
             filterValue = ml1
             viewModel.parseDataAndNotify(org,ml1)
