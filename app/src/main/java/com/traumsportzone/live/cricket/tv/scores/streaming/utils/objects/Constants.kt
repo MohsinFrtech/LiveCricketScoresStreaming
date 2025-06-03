@@ -21,6 +21,9 @@ object Constants {
     const val hlsSource = "hls"
     var xForwardedKey =""
     var mListener: OnHomePressedListener? = null
+    const val preferenceAppOpening="AppOpen"
+    var selectedVenu =-1
+    var playerId = 0
 
     var nativeAdProvider=""
     var positionClick2 = 0
@@ -196,5 +199,34 @@ object Constants {
 
     val dataFormatsMedia3: MutableList<FormatDataMedia3> =
         java.util.ArrayList<FormatDataMedia3>()
+    ////////////
+    //  Stats
+    var statTypeId = ""
+    var TestmatchTypeId = "1"
+    var ODImatchTypeId = "2"
+    var T20matchTypeId = "3"
+    var mostWicketstattypeid = "mostWickets"
+    var mostRunsstattypeid = "mostRuns"
+    var highestScorestattypeid = "highestScore"
+    var highestSrstattypeid = "highestSr"
+    var mostHundredsstattypeid = "mostHundreds"
+    var mostFiftiesstattypeid = "mostFifties"
+    var mostSixesstattypeid = "mostSixes"
+    var mostFoursstattypeid = "mostFours"
+    var highestAvgstattypeid =  "highestAvg"
+    var mostNinetiesstattypeid =  "mostNineties"
+    var headerTitleStats = ""
+
+
+    var mostwickets = "Most Wickets"
+    var mostruns = "Most Runs"
+    var highestscore = "Highest Score"
+    var higheststrikerate = "Highest Strike Rate"
+    var highestAvg = "Highest Average"
+    var mostHundered = "Most Hundered"
+    var mostfifties = "Most Fifties"
+    var mostfour = "Most Fours"
+    var mostsix = "Most Sixes"
+    var mostninties = "Most Ninties"
 
 }

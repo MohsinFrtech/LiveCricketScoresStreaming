@@ -793,7 +793,6 @@ class HomeScreen : AppCompatActivity(), DialogListener, ApiResponseListener {
             startActivity(intent)
             finish()
         }
-
     }
 
     private fun showFailedCppDialog() {
@@ -822,9 +821,7 @@ class HomeScreen : AppCompatActivity(), DialogListener, ApiResponseListener {
                     // You can directly ask for the permission.
                     // The registered ActivityResultCallback gets the result of this request.
                     makePermission()
-
                 }
-
             }
         } else {
             subscribeOrUnSubscribeTopic()
@@ -918,6 +915,9 @@ class HomeScreen : AppCompatActivity(), DialogListener, ApiResponseListener {
 
     override fun onResume() {
         super.onResume()
+        Constants.updateScreenStatus = false
+        rateShown = false
+        Constants.app_update_dialog = false
         //if (!ifPermissionGrantedThenNotResume) {
         if (!isFromNotification) {
             showConsentDialog()
@@ -1013,88 +1013,192 @@ class HomeScreen : AppCompatActivity(), DialogListener, ApiResponseListener {
 
 
     private fun emulatorCheck() {
-//        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S ||
-//            Build.VERSION.SDK_INT == Build.VERSION_CODES.S_V2
-//        ) {
-//            val emulatorDetector: EmulatorDetector =
-//                EmulatorDetector.Builder(this).checkSensors().checkProperties().build()
-//            lifecycleScope.launch {
-//                val state = emulatorDetector.getState()
-//                getDeviceStateDescription(state)
-//            }
-//
-//        }
-//        else{
-//            val noteStatus = preference?.getNotificationPermission(preferenceNoteLay)
-//            if (noteStatus == false) {
-//                checkNotificationPermission()
-//            } else {
-//                navigationToNextScreen()
-//            }
-//        }
+        lifecycleScope.launch {
+            //val state = emulatorDetector.getState()
+            //getDeviceStateDescription(state)
+            try {
+                val isEmulator: Boolean by lazy {
+                    // Android SDK emulator
+                    return@lazy ((Build.FINGERPRINT.startsWith("google/sdk_gphone_")
+                            && Build.FINGERPRINT.endsWith(":user/release-keys")
+                            && Build.MANUFACTURER == "Google" && Build.PRODUCT.startsWith("sdk_gphone_") && Build.BRAND == "google"
+                            && Build.MODEL.startsWith("sdk_gphone_"))
+                            //
+                            || Build.FINGERPRINT.startsWith("generic")
+                            || Build.FINGERPRINT.startsWith("unknown")
+                            || Build.MODEL.contains("google_sdk")
+                            || Build.MODEL.contains("Emulator")
+                            || Build.MODEL.contains("Android SDK built for x86")
+                            //bluestacks
+                            || "QC_Reference_Phone" == Build.BOARD && !"Xiaomi".equals(
+                        Build.MANUFACTURER,
+                        ignoreCase = true
+                    ) //bluestacks
+                            || Build.MANUFACTURER.contains("Genymotion")
+                            || Build.HOST.startsWith("Build") //MSI App Player
+                            || Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
+                            || Build.PRODUCT == "google_sdk"
+                            || Build.FINGERPRINT.contains("generic")
+                            // another Android SDK emulator check
+                            )
+                }
+                getDeviceStateDescription(isEmulator)
+            } catch (e: Exception) {
+                Log.d("Exception", "" + e.message)
 
-        val noteStatus = preference?.getNotificationPermission(preferenceNoteLay)
-        if (noteStatus == false) {
-            checkNotificationPermission()
-        } else {
-            navigationToNextScreen()
+            }
+
         }
 
-
-//
-//        lifecycleScope.launch {
-
-//
-////            try {
-////                val isEmulator: Boolean by lazy {
-////                    // Android SDK emulator
-////                    return@lazy ((Build.FINGERPRINT.startsWith("google/sdk_gphone_") && Build.FINGERPRINT.endsWith(
-////                        ":user/release-keys"
-////                    ) && Build.MANUFACTURER == "Google" && Build.PRODUCT.startsWith("sdk_gphone_") && Build.BRAND == "google" && Build.MODEL.startsWith(
-////                        "sdk_gphone_"
-////                    ))
-////                            //
-////                            || Build.FINGERPRINT.startsWith("generic") || Build.FINGERPRINT.startsWith(
-////                        "unknown"
-////                    ) || Build.MODEL.contains("google_sdk") || Build.MODEL.contains("Emulator") || Build.MODEL.contains(
-////                        "Android SDK built for x86"
-////                    )
-////                            //bluestacks
-////                            || "QC_Reference_Phone" == Build.BOARD && !"Xiaomi".equals(
-////                        Build.MANUFACTURER, ignoreCase = true
-////                    ) //bluestacks
-////                            || Build.MANUFACTURER.contains("Genymotion") || Build.HOST.startsWith("Build") //MSI App Player
-////                            || Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic") || Build.PRODUCT == "google_sdk" || Build.FINGERPRINT.contains(
-////                        "generic"
-////                    )
-////                            // another Android SDK emulator check
-////                            )
-////                }
-////
-////            } catch (e: Exception) {
-////                Log.d("Exception", "" + e.message)
-////            }
-//
-//            getDeviceStateDescription(false)
-//        }
     }
 
-    private fun getDeviceStateDescription(state: DeviceState) {
+    private fun getDeviceStateDescription(state: Boolean) {
         //if (state is DeviceState.Emulator) {
-        if (state is DeviceState.Emulator) {
+        if (state) {
             CustomDialogue(this).showDialog(
                 this, "Alert!", "Please use application on real device", "", "Ok", "baseValue"
             )
         } else {
-            //    navigationToNextScreen()
-            val noteStatus = preference?.getNotificationPermission(preferenceNoteLay)
-            if (noteStatus == false) {
-                checkNotificationPermission()
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S ||
+                Build.VERSION.SDK_INT == Build.VERSION_CODES.S_V2
+            ) {
+                emulatorCheckAgain()
             } else {
-                navigationToNextScreen()
+                /// if not match with above versions.....
+                if (isEmulator(this)) {
+                    CustomDialogue(this).showDialog(
+                        this,
+                        "Alert!",
+                        "Please use application on real device",
+                        "",
+                        "Ok",
+                        "baseValue"
+                    )
+                } else {
+                    Log.d("DeviceStatuss", "not emulator")
+
+                    val checkNoticationLayShow =
+                        preference?.getNotificationPermission(preferenceNoteLay)
+                    if (checkNoticationLayShow == true) {
+                        navigationToNextScreen()
+                    } else {
+                        checkNotificationPermission()
+                    }
+
+                }
+
             }
         }
     }
+    fun hasEmulatorFiles(): Boolean {
+        val knownEmulatorFiles = arrayOf(
+            "/dev/socket/qemud",
+            "/dev/qemu_pipe",
+            "/system/lib/libc_malloc_debug_qemu.so",
+            "/sys/qemu_trace",
+            "/system/bin/qemu-props",
+            "/system/bin/microvirt-prop",  // LDPlayer
+            "/system/bin/microvirt",  // LDPlayer
+            "/data/misc/qemu",  // General emulators
+            "/system/bin/androVM-prop",  // Genymotion
+            "/system/bin/mnprop",  // MEmu
+            "/system/bin/ttVM-prop",  // Tencent Gaming Buddy (Gameloop)
+            "/system/lib/libdroid4x.so",  // Droid4X
+            "/system/bin/nox-prop" // Nox Player
+        )
+
+        for (file in knownEmulatorFiles) {
+            if (File(file).exists()) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun getSystemProperty(key: String): String {
+        try {
+            val systemProperties = Class.forName("android.os.SystemProperties")
+            return systemProperties.getMethod(
+                "get", String::class.java
+            ).invoke(null, key) as String
+        } catch (e: java.lang.Exception) {
+            return ""
+        }
+    }
+
+    fun hasEmulatorProperties(): Boolean {
+        val properties = arrayOf(
+            "ro.kernel.qemu",
+            "ro.product.device",
+            "ro.product.model",
+            "ro.product.brand",
+            "ro.product.manufacturer",
+            "ro.hardware",
+            "ro.bootloader"
+        )
+
+        for (prop in properties) {
+            val value = getSystemProperty(prop!!)
+            if (value.contains("sdk") || value.contains("qemu") || value.contains("emulator")) {
+                return true
+            }
+        }
+        return false
+    }
+
+    fun hasEmulatorApps(context: Context): Boolean {
+        val knownEmulatorApps = arrayOf(
+            "com.bluestacks.appstore",  // BlueStacks
+            "com.bluestacks.settings", "com.microvirt.guide",  // LDPlayer
+            "com.microvirt.installer", "com.memu.launcher",  // MEmu
+            "com.nox.mopen.app",  // Nox Player
+            "com.tencentrelaunchpad" // Tencent Gaming Buddy
+        )
+
+        val pm = context.packageManager
+        for (packageName in knownEmulatorApps) {
+            try {
+                pm.getPackageInfo(packageName!!, 0)
+                return true // Emulator app found
+            } catch (ignored: PackageManager.NameNotFoundException) {
+            }
+        }
+        return false
+    }
+    fun isEmulator(context: Context?): Boolean {
+        return hasEmulatorFiles() || hasEmulatorProperties() || hasEmulatorApps(context!!)
+    }
+
+    private fun emulatorCheckAgain() {
+        val emulatorDetector: EmulatorDetector = EmulatorDetector.Builder(this)
+            .checkSensors()
+            .checkProperties()
+            .build()
+
+        lifecycleScope.launch {
+            val state = emulatorDetector.getState()
+            getDeviceState(state)
+        }
+    }
+
+    private fun getDeviceState(state: DeviceState) {
+        if (state is DeviceState.Emulator) {
+            CustomDialogue(this).showDialog(
+                this, "Alert!", "Please use application on real device",
+                "", "Ok", "baseValue"
+            )
+        } else {
+            val checkNoticationLayShow =
+                preference?.getNotificationPermission(preferenceNoteLay)
+            if (checkNoticationLayShow == true) {
+                navigationToNextScreen()
+            } else {
+                checkNotificationPermission()
+            }
+        }
+    }
+
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -1118,15 +1222,18 @@ class HomeScreen : AppCompatActivity(), DialogListener, ApiResponseListener {
 
     private fun moveToMainScreen() {
         bindingHome?.homeAnimLayout?.visibility = View.GONE
-//        if (isDeviceRooted()) {
-//            CustomDialogue(this).showDialog(
-//                this, "Alert!", "Please use application on real device", "", "Ok", "baseValue"
-//            )
-//        } else {
-//
-//        }
+        if (!isDeviceRooted()){
+            sliderRotation()
+        }else{
+            val bundle = Bundle()
+            bundle.putString("RootedDevice", "Not Passed")
+            firebaseAnalytics?.logEvent("RootedDevice", bundle)
 
-        sliderRotation()
+            CustomDialogue(this).showDialog(
+                this, "Alert!", "You can't use this app on rooted device",
+                "", "Ok", "baseValue"
+            )
+        }
     }
 
 

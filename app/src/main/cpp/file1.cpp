@@ -29,7 +29,7 @@ Java_com_traumsportzone_live_cricket_tv_scores_tv_activities_TvMainActivity_getS
     std::string t3 = "Asgjkkjhgfdswertyuimnbvcxsdfghj";
     std::string t4 = "154140573615627969442741";
     std::string t5 = "https://nodeapi.streamingsoultions.com/";
-    std::string t6 = "https://cricket-data.nospacedidlove.com/api/v1/";
+    std::string t6 = "https://cricket-api.nospacedidlove.com/api/v1/";
     std::string t7Scores = "1h44!6t2aQr?TGbU=kaN6N3W=4Ncw0eS=obuK8q4jiLQ-U8cHERFf6Ol06G2cKYx";
     std::string t8SocketUrl = "ws://cricket-data.nospacedidlove.com/live_score";
     std::string t9SocketMessage =  "{\"command\":\"subscribe\",\"identifier\":\"{\\\"channel\\\":\\\"LiveScoreSocketChannel\\\"}\"}";
@@ -80,7 +80,7 @@ Java_com_traumsportzone_live_cricket_tv_scores_streaming_ui_activities_HomeScree
     std::string t3 = "Asgjkkjhgfdswertyuimnbvcxsdfghj";
     std::string t4 = "154140573615627969442741";
     std::string t5 = "https://nodeapi.streamingsoultions.com/";
-    std::string t6 = "https://cricket-data.nospacedidlove.com/api/v1/";
+    std::string t6 = "https://cricket-api.nospacedidlove.com/api/v1/";
     std::string t7Scores = "1h44!6t2aQr?TGbU=kaN6N3W=4Ncw0eS=obuK8q4jiLQ-U8cHERFf6Ol06G2cKYx";
     std::string t8SocketUrl = "ws://cricket-data.nospacedidlove.com/live_score";
     std::string t9SocketMessage =  "{\"command\":\"subscribe\",\"identifier\":\"{\\\"channel\\\":\\\"LiveScoreSocketChannel\\\"}\"}";

@@ -15,7 +15,6 @@ import java.util.*
 ////AppOpen manager class for handling app open ads
 class AppOpenManager(myApplication: MyApp?) : Application.ActivityLifecycleCallbacks,
     DefaultLifecycleObserver {
-
     private var myApplication: MyApp? = null
     private var appOpenAdManager: AppOpenAdManager
 
@@ -33,14 +32,11 @@ class AppOpenManager(myApplication: MyApp?) : Application.ActivityLifecycleCallb
     }
 
     private fun onMoveToForeground() {
-
         // Show the ad (if available) when the app moves to foreground.
         if (!currentActivity?.localClassName.equals("streaming.ui.activities.HomeScreen",true))
         {
             currentActivity?.let { appOpenAdManager.showAdIfAvailable(it) }
-
         }
-
     }
 
     interface OnShowAdCompleteListener {
@@ -67,7 +63,6 @@ class AppOpenManager(myApplication: MyApp?) : Application.ActivityLifecycleCallb
                 context,
                 "/23209641482/Trunaappopen",
                 request,
-                AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
                 object : AppOpenAd.AppOpenAdLoadCallback() {
 
                     override fun onAdLoaded(ad: AppOpenAd) {

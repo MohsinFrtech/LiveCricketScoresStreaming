@@ -122,8 +122,13 @@
 
     <string name="browse_series">Browse Series</string>
     <string name="browse_teams">Browse Teams</string>
+    <string name="browse_venues">Browse Venues</string>
+    <string name="browse_stats">Browse Stats</string>
 
-
+    <string name="noVenuT20">T20 match for this venu not available to show.</string>
+    <string name="noVenuODI">Odi match for this venu not available to show.</string>
+    <string name="noVenutest">Test match for this venu not available to show.</string>
+    <string name="stat">Stats</string>
 
 
 <!--    rating team -->
@@ -151,6 +156,17 @@
     <string name="dark_mode">Dark Mode</string>
     <string name="settings">Settings</string>
     <string name="general">General</string>
+    <string name="rateUs">Rate Us</string>
 
-
+    <!-- Stats -->
+    <string name="mostwickets">Most Wickets</string>
+    <string name="mostruns">Most Runs</string>
+    <string name="highestscore">Highest Score</string>
+    <string name="higheststrikerate">Highest Strike Rate</string>
+    <string name="highestAvg">Highest Average</string>
+    <string name="mostHundered">Most Hundered</string>
+    <string name="mostfifties">Most Fifties</string>
+    <string name="mostfour">Most Fours</string>
+    <string name="mostsix">Most Sixes</string>
+    <string name="mostninties">Most Ninties</string>
 </resources>

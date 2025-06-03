@@ -52,25 +52,25 @@ class PlayerScreenBottomSheet(player: ExoPlayer, size: Int) : BottomSheetDialogF
         val layout = inflater.inflate(R.layout.player_screen_bottom_layout, container, false)
         playerScreenBottomSheet = DataBindingUtil.bind(layout)
         playerScreenBottomSheet?.lifecycleOwner = this
-        setFormatDataAdapter()
-        playerScreenBottomSheet?.doneBtn?.setOnClickListener {
-            dismiss()
-        }
-
-        playerScreenBottomSheet?.backClick?.setOnClickListener {
-            dismiss()
-        }
+//        setFormatDataAdapter()
+//        playerScreenBottomSheet?.doneBtn?.setOnClickListener {
+//            dismiss()
+//        }
+//
+//        playerScreenBottomSheet?.backClick?.setOnClickListener {
+//            dismiss()
+//        }
 
         return layout
     }
 
     private fun setFormatDataAdapter() {
-        if (!Constants.dataFormats.isNullOrEmpty()) {
-            val adapter = FormatDataAdapter(requireActivity(), this)
-            playerScreenBottomSheet?.channelRecycler?.layoutManager = LinearLayoutManager(context)
-            playerScreenBottomSheet?.channelRecycler?.adapter = adapter
-            adapter?.submitList(Constants.dataFormats)
-        }
+//        if (!Constants.dataFormats.isNullOrEmpty()) {
+//            val adapter = FormatDataAdapter(requireActivity(), this)
+//            playerScreenBottomSheet?.channelRecycler?.layoutManager = LinearLayoutManager(context)
+//            playerScreenBottomSheet?.channelRecycler?.adapter = adapter
+//            adapter?.submitList(Constants.dataFormats)
+//        }
     }
 
     override fun onResume() {

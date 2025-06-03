@@ -75,15 +75,26 @@ class BrowseFragmentMain : Fragment(), AdManagerListener {
             }
         }
 
+        //Browse venue click listener.....
+        binding?.browseVenues?.setOnClickListener {
+
+            findNavController().navigate(BrowseFragmentMainDirections.actionBrowseFragmentToVenueFragment())
+
+        }
+
+        //Browse stats click listener....
+        binding?.browseStats?.setOnClickListener {
+            findNavController().navigate(BrowseFragmentMainDirections.actionBrowseFragmentToMainStatsFragment())
+        }
+
 
         return view
     }
 
     override fun onAdLoad(value: String) {
-        TODO("Not yet implemented")
     }
 
     override fun onAdFinish() {
-        TODO("Not yet implemented")
+
     }
 }

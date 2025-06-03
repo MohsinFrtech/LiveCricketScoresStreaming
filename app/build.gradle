@@ -27,10 +27,10 @@ android {
     defaultConfig {
         applicationId "com.traumsportzone.live.cricket.tv.scores"
 
-        minSdk 21
+        minSdk 23
         targetSdk 35
-        versionCode 194
-        versionName "1.9.4"
+        versionCode 204
+        versionName "2.0.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -71,11 +71,11 @@ dependencies {
 //    implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
 
 
     //Ads section
-    implementation "com.google.android.gms:play-services-ads:23.6.0"    //Admob
+    implementation "com.google.android.gms:play-services-ads:24.2.0"    //Admob
     implementation 'com.facebook.android:audience-network-sdk:6.18.0'  //fbAd
     implementation 'com.chartboost:chartboost-sdk:9.2.1'  //chartboost
     //implementation files('libs/unity-ads.aar')  //Unity Ads
@@ -180,12 +180,13 @@ dependencies {
     implementation "androidx.core:core-splashscreen:1.0.1"
     implementation 'org.java-websocket:Java-WebSocket:1.5.2'
     implementation 'androidx.leanback:leanback:1.0.0'  //tvApp
-    implementation("com.google.android.ump:user-messaging-platform:3.1.0")
+    implementation("com.google.android.ump:user-messaging-platform:3.2.0")
 
+    implementation("com.akexorcist:round-corner-progress-bar:2.2.1")
 
-    implementation("androidx.media3:media3-exoplayer:1.4.1")
-    implementation("androidx.media3:media3-exoplayer-hls:1.4.1")
-    implementation("androidx.media3:media3-ui:1.4.1")
-    implementation("androidx.media3:media3-session:1.4.1")
-    implementation 'androidx.media3:media3-exoplayer-dash:1.4.1'
+    implementation("androidx.media3:media3-exoplayer:1.6.1")
+    implementation("androidx.media3:media3-exoplayer-hls:1.6.1")
+    implementation("androidx.media3:media3-ui:1.6.1")
+    implementation("androidx.media3:media3-session:1.6.1")
+    implementation 'androidx.media3:media3-exoplayer-dash:1.6.1'
 }

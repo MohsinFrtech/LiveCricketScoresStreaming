@@ -1,12 +1,14 @@
 package com.traumsportzone.live.cricket.tv.scores.streaming.adapters
 
 import android.content.Context
+import android.graphics.PorterDuff
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -45,7 +47,7 @@ class FormatDataAdapterMedia3(
 
     class EventAdapterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        val imgChannel = itemView.findViewById<ImageView>(R.id.check_uncheck)
+        val imgChannel = itemView.findViewById<ImageView>(R.id.inside_dark)
         val textChannel = itemView.findViewById<TextView>(R.id.formatValue)
         val mainBack = itemView.findViewById<ConstraintLayout>(R.id.mainClick)
 
@@ -65,9 +67,19 @@ class FormatDataAdapterMedia3(
 
         }
         if (position == positionClick2) {
-            holder.imgChannel.visibility=View.VISIBLE
+            context?.let { ContextCompat.getColor(it, R.color.colorAccent) }?.let {
+                holder.imgChannel?.setColorFilter(
+                    it, PorterDuff.Mode.MULTIPLY
+                )
+            }
+//            holder.imgChannel.visibility=View.VISIBLE
         } else {
-            holder.imgChannel.visibility=View.GONE
+            context?.let { ContextCompat.getColor(it, R.color.white) }?.let {
+                holder.imgChannel?.setColorFilter(
+                    it, PorterDuff.Mode.MULTIPLY
+                )
+            }
+//            holder.imgChannel.visibility=View.GONE
         }
         holder.mainBack.setOnClickListener {
             formatSelection.navigation(currentList[position],position)

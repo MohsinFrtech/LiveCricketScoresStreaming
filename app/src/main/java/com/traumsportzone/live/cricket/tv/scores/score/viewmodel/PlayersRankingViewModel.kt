@@ -1,14 +1,17 @@
 package com.traumsportzone.live.cricket.tv.scores.score.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import com.traumsportzone.live.cricket.tv.scores.score.model.LiveToken
+import com.traumsportzone.live.cricket.tv.scores.score.model.PlayerDetailClass
 import com.traumsportzone.live.cricket.tv.scores.score.model.PlayersRankingModel
 import com.traumsportzone.live.cricket.tv.scores.score.network.ApiServices
 import com.traumsportzone.live.cricket.tv.scores.score.utility.Cons
 import com.traumsportzone.live.cricket.tv.scores.score.utility.listeners.ApiResponseListener
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants
 import kotlinx.coroutines.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -51,10 +54,12 @@ class PlayersRankingViewModel : ViewModel() {
         get() = _allRoundersList
 
 
-    /*private var _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean>
-        get() = _isLoading*/
+    private val _playerRankingDetail = MutableLiveData<PlayerDetailClass?>()
+    val playerRankingDetail: LiveData<PlayerDetailClass?>
+        get() = _playerRankingDetail
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
 
     init {
         //_isLoading.value=true
@@ -63,13 +68,10 @@ class PlayersRankingViewModel : ViewModel() {
 
     fun getSpinnerData(): List<String> {
         val list = ArrayList<String>()
-
         list.add("ODI")
         list.add("T20")
         list.add("Test")
-
         return list
-
     }
 
     fun getODIRanking() {
@@ -242,26 +244,66 @@ class PlayersRankingViewModel : ViewModel() {
         }
     }
 
-//    private fun addAllToList() {
-//        newList.addAll(_teamsT20List.value ?: emptyList())
-//        newList.addAll(_teamsTestList.value ?: emptyList())
-//        newList.addAll(_teamsOdiList.value ?: emptyList())
-//
-//        newList.forEach {
-//            if (it.category.equals(Cons.player_bowler, true)) {
-//                bowlersNewList.add(it)
-//            } else if (it.category.equals(Cons.player_batsmen, true)) {
-//                batsmenNewList.add(it)
-//            } else {
-//                allRounderNewList.add(it)
-//            }
-//        }
-//
-//        _batsmenList.value = batsmenNewList
-//        _bowlersList.value = bowlersNewList
-//        _allRoundersList.value = allRounderNewList
-//
-//    }
+    ///get Player Ranking Detail.....
+    fun getPlayerRankingDetail() {
+        _playerRankingDetail.value = null
+        try {
+            _isLoading.value = true
+            coroutineScope.launch {
+                val apiToken = LiveToken()
+                apiToken.token = Cons.s_token
+                apiToken.id = Constants.playerId
+                val body = Gson().toJson(apiToken)
+                    .toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+
+                val getResponse = ApiServices.retrofitService2.getPlayerInfo(body)
+                try {
+                    apiResponseListener?.onStarted()
+                    val responseResult = getResponse.await()
+
+                    withContext(Dispatchers.Main) {
+                        responseResult.let {
+                            if (it != null) {
+                                _playerRankingDetail.value = it
+                            }
+                        }
+
+                        apiResponseListener?.onSuccess()
+                        _isLoading.value = false
+                    }
+                } catch (e: java.lang.Exception) {
+                    when (e) {
+                        is UnknownHostException -> {
+                            withContext(Dispatchers.Main) {
+                                apiResponseListener?.onFailure("Kindly check you Internet Connection!")
+                                _isLoading.value = false
+                                _playerRankingDetail.value = null
+                            }
+                        }
+
+                        is SocketTimeoutException -> {
+                            withContext(Dispatchers.Main) {
+                                apiResponseListener?.onFailure("Kindly check you Internet Connection!")
+                                _isLoading.value = false
+                                _playerRankingDetail.value = null
+                            }
+                        }
+
+                        else -> {
+                            withContext(Dispatchers.Main) {
+                                apiResponseListener?.onFailure("An error occurred. Try again later!")
+                                _isLoading.value = false
+                                _playerRankingDetail.value = null
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: java.lang.Exception) {
+            Log.d("Exception","msg")
+            _isLoading.value = false
+        }
+    }
 
 
     override fun onCleared() {

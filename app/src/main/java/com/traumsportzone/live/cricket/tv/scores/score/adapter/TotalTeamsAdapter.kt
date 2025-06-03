@@ -43,8 +43,6 @@ class TotalTeamsAdapter(private val listSeries: List<AllTeamsModel?>, private va
         holder.bind(league)
 
         holder.itemView.setSafeOnClickListener {
-
-
             val direction= league.team_id?.let { it1 ->
                 TeamFragmentDirections.actionTeamFragmentToTeamsMatchesFragment(
                     it1,league.team_name)

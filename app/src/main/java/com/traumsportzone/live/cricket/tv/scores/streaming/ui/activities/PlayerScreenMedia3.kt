@@ -243,20 +243,19 @@ class PlayerScreenMedia3 : AppCompatActivity(), Player.Listener,
             }
         }
 
-        bindingExoPlayback?.lang?.setOnClickListener {
-            if (playerMedia3 != null) {
-                if (!isShowingTrackSelectionDialog && willHaveContent(playerMedia3!!)) {
-                    getAudioPresentInsideUrl(playerMedia3)
-                }
-            }
-        }
+//        bindingExoPlayback?.lang?.setOnClickListener {
+//            if (playerMedia3 != null) {
+//                if (!isShowingTrackSelectionDialog && willHaveContent(playerMedia3!!)) {
+//                    getAudioPresentInsideUrl(playerMedia3)
+//                }
+//            }
+//        }
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
+            bindingExoPlayback?.miniPlayerIcon?.visibility = View.VISIBLE
             checkHomeButton()
         } else {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//
-//            }
+            bindingExoPlayback?.miniPlayerIcon?.visibility = View.GONE
         }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -294,6 +293,38 @@ class PlayerScreenMedia3 : AppCompatActivity(), Player.Listener,
 
             }
         })
+        bindingExoPlayback?.miniPlayerIcon?.setOnClickListener {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
+                if (!isInPictureInPictureMode) {
+                    if (lifecycle.currentState == Lifecycle.State.RESUMED) {
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                val params = updatePictureInPictureParams()
+                                if (!isFinishing) {
+                                    enterPictureInPictureMode(params)
+                                }
+                            }
+                        } catch (e: java.lang.Exception) {
+                            val bundle = Bundle()
+                            bundle.putString("pipFinish", "not Resumed")
+                            firebaseAnalytics?.logEvent("pipFinish", bundle)
+                            Log.d("Exception", "msg")
+                        }
+                    } else {
+                        val bundle = Bundle()
+                        bundle.putString("resume", "not Resumed")
+                        firebaseAnalytics?.logEvent("resumeStatus", bundle)
+                        Log.d("Exception", "msg")
+                    }
+                } else {
+                    val bundle = Bundle()
+                    bundle.putString("pipMode", "Already")
+                    firebaseAnalytics?.logEvent("pipMode", bundle)
+                }
+            }
+
+        }
+
     }
 
 
@@ -382,9 +413,37 @@ class PlayerScreenMedia3 : AppCompatActivity(), Player.Listener,
                 }
 
 
+                ///////////
+                Constants.dataFormatsAudioMedia3.clear()
+                val tracksAudio = player.currentTracks
+//                val videoTracks = tracks.groups.filter { it.type == C.TRACK_TYPE_VIDEO }
+//                Constants.dataFormatsAudio.add(FormatDataAudio(null, null))
+                tracksAudio.groups.forEach { trackGroup ->
+                    (0 until trackGroup.length).forEach { i ->
+                        Log.d("valuesAudio" + " text", "${trackGroup.length}")
+                        if (trackGroup.type == C.TRACK_TYPE_TEXT) {
+                            val track = trackGroup.getTrackFormat(i)
+                            if (track.language != null) {
+                                Constants.dataFormatsAudioMedia3.add(FormatDataAudioMedia3(track, trackGroup))
+                            }
+                            Log.d("valuesAudio" + " text", "${track.language}")
+                            // ...
+                        } else if (trackGroup.type == C.TRACK_TYPE_AUDIO) {
+                            val track = trackGroup.getTrackFormat(i)
+                            if (track.language != null) {
+                                Constants.dataFormatsAudioMedia3.add(FormatDataAudioMedia3(track, trackGroup))
+                            }
+                            Log.d("valuesAudio" + "Audio", track.language.toString() + " " + i)
+                        }
+
+                    }
+                }
+
+
                 if (!Constants.dataFormatsMedia3.isNullOrEmpty()) {
                     val fullscreenModal =
-                        PlayerScreenBottomSheetMedia3(player, Constants.dataFormatsMedia3.size)
+                        PlayerScreenBottomSheetMedia3(player, Constants.dataFormatsMedia3.size,
+                            context)
                     supportFragmentManager.let {
                         fullscreenModal.show(
                             it,
@@ -395,8 +454,6 @@ class PlayerScreenMedia3 : AppCompatActivity(), Player.Listener,
 
             }
         }
-
-        /////
 
     }
 
@@ -2141,8 +2198,6 @@ class PlayerScreenMedia3 : AppCompatActivity(), Player.Listener,
 //        binding?.playerViewExo?.visibility = View.GONE
         binding?.playerView?.visibility = View.VISIBLE
         val listDrmModel: MutableList<DrmModel> = mutableListOf()
-
-
         // Setup DefaultDrmSessionManager for ClearKey
 //        val keyId = "9002ec8c3dbc55c5bccdcd6871d80fd0".toByteArray(Charsets.UTF_8)
 //        val key = "7099325123bae7810db508727bb0bc7d".toByteArray(Charsets.UTF_8)

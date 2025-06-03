@@ -12,7 +12,13 @@
             android:id="@+id/action_streaming_fragment_to_channel"
             app:destination="@id/channel" />
     </fragment>
+    <fragment
+        android:id="@+id/playerRankingDetail"
+        android:name="com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.ranking.PlayerRankingDetail"
+        tools:layout="@layout/player_ranking_detail"
+        android:label="Player Ranking Detail Fragment">
 
+    </fragment>
     <fragment
         android:id="@+id/home"
         android:name="com.traumsportzone.live.cricket.tv.scores.MainFragment"
@@ -128,7 +134,45 @@
         <action
             android:id="@+id/action_browseFragment_to_teamFragment"
             app:destination="@id/teamFragment" />
+        <action
+            android:id="@+id/action_browseFragment_to_venueFragment"
+            app:destination="@id/venueFragment" />
+        <action
+            android:id="@+id/action_browseFragment_to_mainStatsFragment"
+            app:destination="@id/mainStatsFragment" />
 
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/mainStatsFragment"
+        android:name="com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.statsfragment.MainStatsFragment"
+        android:label="Main Stats Fragment"
+        tools:layout="@layout/main_stats_lay">
+
+        <action
+            android:id="@+id/action_mainStatsFragment_to_statFragment"
+            app:destination="@id/statFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/statFragment"
+        android:name="com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.statsfragment.InsideStatFragment"
+        tools:layout="@layout/inside_stat_lay"
+        android:label="Stats">
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/venueFragment"
+        android:name="com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.venufragments.VenuFragment"
+        android:label="Venu Fragment"
+        tools:layout="@layout/venu_screen">
+
+
+        <action
+            android:id="@+id/action_venueFragment_to_venuMatchesFragment"
+            app:destination="@id/venuMatchesFragment" />
     </fragment>
 
     <fragment
@@ -138,6 +182,9 @@
         tools:layout="@layout/fragment_ranking">
 
 
+        <action
+            android:id="@+id/action_rankingFragment_to_playerRankingDetail"
+            app:destination="@id/playerRankingDetail" />
     </fragment>
 
     <fragment
@@ -219,5 +266,18 @@
         tools:layout="@layout/news_detail">
 
     </fragment>
+
+    <fragment
+        android:id="@+id/venuMatchesFragment"
+        android:name="com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.venufragments.VenuMatchesFragment"
+        tools:layout="@layout/venu_matches_layout"
+        android:label="Venu Matches Fragment">
+
+
+        <action
+            android:id="@+id/action_venuMatchesFragment_to_live_details"
+            app:destination="@id/live_details" />
+    </fragment>
+
 </navigation>
 

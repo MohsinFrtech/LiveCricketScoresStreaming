@@ -1,10 +1,22 @@
 package com.traumsportzone.live.cricket.tv.scores.score.network
 
+import com.cricgenix.live.cricket.appmodels.VenuModel
 import com.traumsportzone.live.cricket.tv.scores.score.model.AllTeamsModel
 import com.traumsportzone.live.cricket.tv.scores.score.model.CommentryModelClass
 import com.traumsportzone.live.cricket.tv.scores.score.model.LiveScoresModel
+import com.traumsportzone.live.cricket.tv.scores.score.model.MainHighestAverage
+import com.traumsportzone.live.cricket.tv.scores.score.model.MainHighestScore
+import com.traumsportzone.live.cricket.tv.scores.score.model.MainHighestStrrikeRate
+import com.traumsportzone.live.cricket.tv.scores.score.model.MainMostFifties
+import com.traumsportzone.live.cricket.tv.scores.score.model.MainMostHundereds
+import com.traumsportzone.live.cricket.tv.scores.score.model.MainMostNinties
+import com.traumsportzone.live.cricket.tv.scores.score.model.MainMostRuns
+import com.traumsportzone.live.cricket.tv.scores.score.model.MainMostSix
+import com.traumsportzone.live.cricket.tv.scores.score.model.MainMostWicket
+import com.traumsportzone.live.cricket.tv.scores.score.model.MianMostFour
 import com.traumsportzone.live.cricket.tv.scores.score.model.NewsModel
 import com.traumsportzone.live.cricket.tv.scores.score.model.NewsdetailModel
+import com.traumsportzone.live.cricket.tv.scores.score.model.PlayerDetailClass
 import com.traumsportzone.live.cricket.tv.scores.score.model.PlayersRankingModel
 import com.traumsportzone.live.cricket.tv.scores.score.model.RankingTeams
 import com.traumsportzone.live.cricket.tv.scores.score.model.ScoreboardModel
@@ -117,4 +129,78 @@ interface Interfaces {
     fun getNewsDetail(
         @Body body: RequestBody
     ): Call<NewsdetailModel?>
+
+    @POST("player_rankings/player/")
+    fun getPlayerInfo(
+        @Body body: RequestBody
+    ): Call<PlayerDetailClass>
+
+    //All Venus....
+    @POST("venues/all")
+    fun getAllVenues(
+        @Body body: RequestBody
+    ): Call<List<VenuModel>>
+
+    //All Venus Matches....
+    @POST("venues/{number}/matches")
+    fun getAllVenuesMatches(
+        @Body body: RequestBody,
+        @Path("number") number: Int
+    ): Call<List<LiveScoresModel>>
+
+
+
+    ///Functions related to stats api call.
+
+    @POST("records/fetch")
+    fun getMostWickets(
+        @Body body: RequestBody
+    ): Call<MainMostWicket>
+
+    @POST("records/fetch")
+    fun getMostRuns(
+        @Body body: RequestBody
+    ): Call<MainMostRuns>
+
+    @POST("records/fetch")
+    fun getHighestScore(
+        @Body body: RequestBody
+    ): Call<MainHighestScore>
+
+    @POST("records/fetch")
+    fun getHighestStrike(
+        @Body body: RequestBody
+    ): Call<MainHighestStrrikeRate>
+
+    @POST("records/fetch")
+    fun getMostHundered(
+        @Body body: RequestBody
+    ): Call<MainMostHundereds>
+
+
+
+    @POST("records/fetch")
+    fun getMostFifties(
+        @Body body: RequestBody
+    ): Call<MainMostFifties>
+
+    @POST("records/fetch")
+    fun getMostFour(
+        @Body body: RequestBody
+    ): Call<MianMostFour>
+
+    @POST("records/fetch")
+    fun getMostSix(
+        @Body body: RequestBody
+    ): Call<MainMostSix>
+
+    @POST("records/fetch")
+    fun getHighestAvg(
+        @Body body: RequestBody
+    ): Call<MainHighestAverage>
+
+    @POST("records/fetch")
+    fun getMostNinties(
+        @Body body: RequestBody
+    ): Call<MainMostNinties>
 }

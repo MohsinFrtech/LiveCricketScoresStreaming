@@ -10,7 +10,11 @@
         <item name="itemTextColor">@color/colorPrimary</item>
     </style>
 
-
+    <style name="MyRoundedDialogTheme" parent="Theme.MaterialComponents.Dialog">
+        <item name="dialogCornerRadius">@dimen/_15sdp</item>
+        <item name="colorPrimary">@color/gnt_red</item>
+        <item name="android:windowBackground">@drawable/traun_back</item>
+    </style>
 
     <style name="SpinnerItem_example" parent="android:TextAppearance.DeviceDefault.Widget.TextView.SpinnerItem">
         <item name="android:textColor">@color/colorPrimary</item>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="modelData"
+            type="com.traumsportzone.live.cricket.tv.scores.score.model.MostWickets"
+            />
+        <variable
+            name="modelDataRun"
+            type="com.traumsportzone.live.cricket.tv.scores.score.model.MostRuns" />
+        <variable
+            name="modelDataHighestScore"
+            type="com.traumsportzone.live.cricket.tv.scores.score.model.HighestScore" />
+        <variable
+            name="modelDataHighestSr"
+            type="com.traumsportzone.live.cricket.tv.scores.score.model.HighestStrrikeRate" />
+        <variable
+            name="modelDataMostHundered"
+            type="com.traumsportzone.live.cricket.tv.scores.score.model.MostHundereds" />
+        <variable
+            name="modelDataMostFifties"
+            type="com.traumsportzone.live.cricket.tv.scores.score.model.MostFifties" />
+        <variable
+            name="modelDataMostSixes"
+            type="com.traumsportzone.live.cricket.tv.scores.score.model.MostSix" />
+        <variable
+            name="modelDataMostFours"
+            type="com.traumsportzone.live.cricket.tv.scores.score.model.MostFour" />
+        <variable
+            name="modelDataHighestAvg"
+            type="com.traumsportzone.live.cricket.tv.scores.score.model.HighestAverage" />
+        <variable
+            name="modelDataMostNinties"
+            type="com.traumsportzone.live.cricket.tv.scores.score.model.MostNinties" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainStatLayput"
+        android:layout_width="match_parent"
+        app:layout_constraintHorizontal_weight="100"
+        android:layout_height="@dimen/_20sdp">
+
+        <TextView
+            android:id="@+id/txtName"
+            android:layout_width="0sp"
+            app:layout_constraintHorizontal_weight="50"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@+id/innerLayAnother"
+            android:text="Name"
+            android:textSize="13sp"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="@dimen/_10sdp">
+
+        </TextView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0sp"
+        android:id="@+id/innerLayAnother"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_weight="50"
+        app:layout_constraintStart_toEndOf="@+id/txtName"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/txtWicket"
+            android:layout_width="0sp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="W"
+            app:layout_constraintEnd_toStartOf="@+id/txtMatches"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            >
+
+        </TextView>
+
+        <TextView
+            android:id="@+id/txtMatches"
+            android:layout_width="0sp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="M"
+            app:layout_constraintEnd_toStartOf="@+id/txtOvers"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/txtWicket"
+            >
+
+        </TextView>
+
+
+        <TextView
+            android:id="@+id/txtOvers"
+            android:layout_width="0sp"
+            app:layout_constraintStart_toEndOf="@+id/txtMatches"
+            android:layout_height="wrap_content"
+            android:text="Overs"
+            android:textAlignment="center"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/txtAvg"
+            >
+
+        </TextView>
+
+        <TextView
+            android:id="@+id/txtAvg"
+            android:layout_width="0sp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Average"
+            app:layout_constraintStart_toEndOf="@+id/txtOvers"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="@dimen/_10sdp"
+            >
+
+        </TextView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

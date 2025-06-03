@@ -28,7 +28,6 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:id="@+id/mainFit"
-                android:layout_marginTop="@dimen/_10sdp"
                 android:background="@color/colorPrimaryDark"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

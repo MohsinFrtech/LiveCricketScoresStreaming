@@ -6,22 +6,22 @@
         android:title="Streaming" />
     <item
         android:id="@+id/home"
-        android:icon="@drawable/ic_home"
-        android:title="Home" />
+        android:icon="@drawable/score_trauna"
+        android:title="Scores" />
 
     <item
         android:id="@+id/recentFragment"
-        android:icon="@drawable/ic_recent"
+        android:icon="@drawable/recent_trauna"
         android:title="Recent" />
 
     <item
         android:id="@+id/upcomingFragment"
-            android:icon="@drawable/ic_upcoming"
+            android:icon="@drawable/upcoming_trauna"
         android:title="Upcoming" />
 
 
     <item
         android:id="@+id/moreFragment"
-        android:icon="@drawable/ic_more"
+        android:icon="@drawable/more_trauna"
         android:title="More" />
 </menu>

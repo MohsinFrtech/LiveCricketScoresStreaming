@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.traumsportzone.live.cricket.tv.scores.R
 import com.traumsportzone.live.cricket.tv.scores.databinding.FragmentPlayerRankBinding
@@ -81,13 +82,9 @@ class BatsManRankingFragment : Fragment(), AdapterView.OnItemSelectedListener {
         try {
 
             val listAdapter = PlayersRankAdapterNew(PlayersRankAdapterNew.OnClickListener {
-                if (!it.name.isNullOrEmpty()) {
-                    /* this.findNavController().navigate(
-                         RankingFragmentDirections.actionRankingFragmentToTeamsMatchesFragment(
-                             it.player_id!!,
-                             it.name
-                         )
-                     )*/
+                if(it!=null){
+                    val direction_from = RankingFragmentDirections.actionRankingFragmentToPlayerRankingDetail()
+                    findNavController()?.navigate(direction_from)
                 }
             })
             binding?.recyclerViewTeams?.layoutManager =

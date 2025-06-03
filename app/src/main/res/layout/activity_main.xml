@@ -22,7 +22,7 @@
             android:id="@+id/mainFit"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_40sdp"
-            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginTop="0sp"
             android:background="@color/colorPrimaryDark"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">

@@ -1,6 +1,7 @@
 package com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.ranking
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.traumsportzone.live.cricket.tv.scores.R
 import com.traumsportzone.live.cricket.tv.scores.databinding.FragmentPlayerRankBinding
@@ -70,13 +72,9 @@ class BowlerRankingFragment : Fragment(), AdapterView.OnItemSelectedListener {
     private fun setAdapter2(list: List<PlayersRankingModel?>) {
         try {
             val listAdapter = PlayersRankAdapterNew(PlayersRankAdapterNew.OnClickListener {
-                if (!it.name.isNullOrEmpty()) {
-                    /* this.findNavController().navigate(
-                         RankingFragmentDirections.actionRankingFragmentToTeamsMatchesFragment(
-                             it.player_id!!,
-                             it.name
-                         )
-                     )*/
+                if(it!=null){
+                    val direction_from = RankingFragmentDirections.actionRankingFragmentToPlayerRankingDetail()
+                    findNavController()?.navigate(direction_from)
                 }
             })
             binding?.recyclerViewTeams?.layoutManager =
@@ -85,7 +83,7 @@ class BowlerRankingFragment : Fragment(), AdapterView.OnItemSelectedListener {
             listAdapter.submitList(list)
 
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.d("Exception","msg")
         }
     }
 

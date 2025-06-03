@@ -17,6 +17,7 @@ import com.traumsportzone.live.cricket.tv.scores.databinding.NativeAdLayoutNew2B
 import com.traumsportzone.live.cricket.tv.scores.score.model.LiveScoresModel
 import com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.RecentFragmentDirections
 import com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.SeriesMatchFragmentDirections
+import com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.venufragments.VenuMatchesFragmentDirections
 import com.traumsportzone.live.cricket.tv.scores.score.utility.Cons
 import com.traumsportzone.live.cricket.tv.scores.score.utility.Cons.convertLongToTime
 import com.traumsportzone.live.cricket.tv.scores.streaming.adsData.AdManager
@@ -487,8 +488,10 @@ class LiveSliderAdapterNative(
                                     )
                                 navigateData.navigation(itemDirection2)
                             }
-
-
+                        }else if (source.equals("venu", true)){
+                            val itemDirection2 =
+                                VenuMatchesFragmentDirections.actionVenuMatchesFragmentToLiveDetails(data)
+                            navigateData.navigation(itemDirection2)
                         }
 
                     }

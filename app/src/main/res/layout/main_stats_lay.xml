@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:background="@color/colorPrimary"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/backarrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_marginTop="@dimen/_15sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_arrow_back_black_24dp"
+            app:tint="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:id="@+id/mainText"
+            android:textStyle="bold"
+            android:fontFamily="@font/raleway_medium"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="@string/stat"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_height="wrap_content">
+        </TextView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:layout_marginEnd="@dimen/_5sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/mainText"
+            android:background="@drawable/item_bg_more"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_width="@dimen/_20sdp"
+                android:id="@+id/seriesIcon"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_margin="@dimen/_10sdp"
+                android:contentDescription="@string/rateUs"
+                android:src="@drawable/most_wickets"
+                android:layout_height="@dimen/_20sdp"
+                app:tint="@color/white">
+
+            </ImageView>
+
+            <TextView
+                android:layout_width="0sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:id="@+id/mostwicketText"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="@string/mostwickets"
+                app:layout_constraintTop_toTopOf="@+id/seriesIcon"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@+id/seriesIcon"
+                app:layout_constraintBottom_toBottomOf="@+id/seriesIcon"
+                android:layout_height="wrap_content">
+
+            </TextView>
+
+            <View
+                android:id="@+id/dividershare1"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/seriesIcon" />
+
+            <ImageView
+                android:layout_width="@dimen/_20sdp"
+                android:id="@+id/mostrunIcon"
+                app:layout_constraintTop_toBottomOf="@+id/dividershare1"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_margin="@dimen/_10sdp"
+                android:contentDescription="@string/rateUs"
+                android:src="@drawable/most_runs"
+                android:layout_height="@dimen/_20sdp"
+                app:tint="@color/white">
+
+            </ImageView>
+            <TextView
+                android:layout_width="0sp"
+                android:id="@+id/mostRunText"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="@string/mostruns"
+                app:layout_constraintTop_toTopOf="@+id/mostrunIcon"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@+id/mostrunIcon"
+                app:layout_constraintBottom_toBottomOf="@+id/mostrunIcon"
+                android:layout_height="wrap_content"/>
+
+
+            <View
+                android:id="@+id/dividershare2"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mostrunIcon" />
+
+
+
+            <ImageView
+                android:id="@+id/highestscoreIcon"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_margin="@dimen/_10sdp"
+                android:src="@drawable/highest_score"
+                app:tint="@color/white"
+                app:layout_constraintTop_toBottomOf="@+id/dividershare2"
+                app:layout_constraintStart_toStartOf="parent">
+
+
+            </ImageView>
+
+            <TextView
+                android:layout_width="0sp"
+                android:id="@+id/highestscoreText"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="@string/highestscore"
+                app:layout_constraintTop_toTopOf="@+id/highestscoreIcon"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@+id/highestscoreIcon"
+                app:layout_constraintBottom_toBottomOf="@+id/highestscoreIcon"
+                android:layout_height="wrap_content"/>
+
+            <View
+                android:id="@+id/dividershare3"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/highestscoreIcon" />
+
+            <ImageView
+                android:id="@+id/higheststrikeIcon"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_margin="@dimen/_10sdp"
+                android:src="@drawable/highest_strike_rate"
+                app:tint="@color/white"
+                app:layout_constraintTop_toBottomOf="@+id/dividershare3"
+                app:layout_constraintStart_toStartOf="parent">
+
+            </ImageView>
+
+            <TextView
+                android:layout_width="0sp"
+                android:id="@+id/higheststrikeText"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="@string/higheststrikerate"
+                app:layout_constraintTop_toTopOf="@+id/higheststrikeIcon"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@+id/higheststrikeIcon"
+                app:layout_constraintBottom_toBottomOf="@+id/higheststrikeIcon"
+                android:layout_height="wrap_content"/>
+
+            <View
+                android:id="@+id/dividershare4"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/higheststrikeIcon" />
+
+            <ImageView
+                android:id="@+id/mosthunderedIcon"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_margin="@dimen/_10sdp"
+                android:src="@drawable/most_100s"
+                app:tint="@color/white"
+                app:layout_constraintTop_toBottomOf="@+id/dividershare4"
+                app:layout_constraintStart_toStartOf="parent">
+
+            </ImageView>
+
+            <TextView
+                android:layout_width="0sp"
+                android:id="@+id/mosthunderedText"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="@string/mostHundered"
+                app:layout_constraintTop_toTopOf="@+id/mosthunderedIcon"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@+id/mosthunderedIcon"
+                app:layout_constraintBottom_toBottomOf="@+id/mosthunderedIcon"
+                android:layout_height="wrap_content"/>
+
+            <View
+                android:id="@+id/dividershare5"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mosthunderedIcon" />
+
+            <ImageView
+                android:id="@+id/mostfiftiesIcon"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_margin="@dimen/_10sdp"
+                android:src="@drawable/most_50s"
+                app:tint="@color/white"
+                app:layout_constraintTop_toBottomOf="@+id/dividershare5"
+                app:layout_constraintStart_toStartOf="parent">
+
+            </ImageView>
+
+            <TextView
+                android:layout_width="0sp"
+                android:id="@+id/mostfiftiesText"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="@string/mostfifties"
+                app:layout_constraintTop_toTopOf="@+id/mostfiftiesIcon"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@+id/mostfiftiesIcon"
+                app:layout_constraintBottom_toBottomOf="@+id/mostfiftiesIcon"
+                android:layout_height="wrap_content"/>
+
+            <View
+                android:id="@+id/dividershare6"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mostfiftiesIcon" />
+
+            <ImageView
+                android:id="@+id/mostsixIcon"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_margin="@dimen/_10sdp"
+                android:src="@drawable/most_6s"
+                app:tint="@color/white"
+                app:layout_constraintTop_toBottomOf="@+id/dividershare6"
+                app:layout_constraintStart_toStartOf="parent">
+
+            </ImageView>
+
+            <TextView
+                android:layout_width="0sp"
+                android:id="@+id/mostsixText"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="@string/mostsix"
+                app:layout_constraintTop_toTopOf="@+id/mostsixIcon"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@+id/mostsixIcon"
+                app:layout_constraintBottom_toBottomOf="@+id/mostsixIcon"
+                android:layout_height="wrap_content"/>
+
+            <View
+                android:id="@+id/dividershare7"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mostsixIcon" />
+
+            <ImageView
+                android:id="@+id/mostfourIcon"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_margin="@dimen/_10sdp"
+                android:src="@drawable/most_4s"
+                app:tint="@color/white"
+                app:layout_constraintTop_toBottomOf="@+id/dividershare7"
+                app:layout_constraintStart_toStartOf="parent">
+
+            </ImageView>
+
+            <TextView
+                android:layout_width="0sp"
+                android:id="@+id/mostfourText"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="@string/mostfour"
+                app:layout_constraintTop_toTopOf="@+id/mostfourIcon"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@+id/mostfourIcon"
+                app:layout_constraintBottom_toBottomOf="@+id/mostfourIcon"
+                android:layout_height="wrap_content"/>
+
+            <View
+                android:id="@+id/dividershare8"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mostfourIcon" />
+            <ImageView
+                android:id="@+id/highestaverageIcon"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_margin="@dimen/_10sdp"
+                android:src="@drawable/highest_average"
+                app:tint="@color/white"
+                app:layout_constraintTop_toBottomOf="@+id/dividershare8"
+                app:layout_constraintStart_toStartOf="parent">
+
+            </ImageView>
+
+            <TextView
+                android:layout_width="0sp"
+                android:id="@+id/highestaverageText"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="@string/highestAvg"
+                app:layout_constraintTop_toTopOf="@+id/highestaverageIcon"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@+id/highestaverageIcon"
+                app:layout_constraintBottom_toBottomOf="@+id/highestaverageIcon"
+                android:layout_height="wrap_content"/>
+
+            <View
+                android:id="@+id/dividershare9"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/highestaverageIcon" />
+
+            <ImageView
+                android:id="@+id/mostnintiesIcon"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_margin="@dimen/_10sdp"
+                android:src="@drawable/most_90s"
+                app:tint="@color/white"
+                android:layout_marginBottom="@dimen/_10sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dividershare9"
+                app:layout_constraintStart_toStartOf="parent">
+
+            </ImageView>
+
+            <TextView
+                android:layout_width="0sp"
+                android:id="@+id/mostnintiesText"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:text="@string/mostninties"
+                app:layout_constraintTop_toTopOf="@+id/mostnintiesIcon"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toEndOf="@+id/mostnintiesIcon"
+                app:layout_constraintBottom_toBottomOf="@+id/mostnintiesIcon"
+                android:layout_height="wrap_content"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</layout>

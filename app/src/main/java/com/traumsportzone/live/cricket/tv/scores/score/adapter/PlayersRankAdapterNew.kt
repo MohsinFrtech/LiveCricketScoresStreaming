@@ -9,6 +9,7 @@ import com.traumsportzone.live.cricket.tv.scores.R
 import com.traumsportzone.live.cricket.tv.scores.databinding.ItemPlayerRankBinding
 import com.traumsportzone.live.cricket.tv.scores.score.model.PlayersRankingModel
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.CodeUtils.setSafeOnClickListener
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants
 
 class PlayersRankAdapterNew(private val onClickListener: OnClickListener) :
     ListAdapter<PlayersRankingModel, PlayersRankAdapterNew.ViewHolder>(DiffCallback) {
@@ -60,6 +61,9 @@ class PlayersRankAdapterNew(private val onClickListener: OnClickListener) :
         holder.bind(item)
 
         holder.itemView.setSafeOnClickListener {
+            if (item.player_id!=null) {
+                Constants.playerId = item.player_id
+            }
             onClickListener.onClick(item)
         }
     }

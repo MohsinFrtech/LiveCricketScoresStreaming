@@ -61,4 +61,14 @@ class SharedPreference(context: Context?) {
     fun getNotificationPermission(key: String):Boolean? {
         return mPref?.getBoolean(key, false)
     }
+
+    fun getAppOpeningValue(key: String):Int? {
+        return mPref?.getInt(key,0)
+    }
+
+
+    fun saveAppOpeningValue(key: String, value: Int) {
+        mEditor?.putInt(key, value)
+        mEditor?.commit()
+    }
 }

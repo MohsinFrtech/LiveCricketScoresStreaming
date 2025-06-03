@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
@@ -19,10 +20,12 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -33,6 +36,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
+import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
 import com.facebook.ads.AdSettings
 import com.getkeepsafe.relinker.ReLinker
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -72,6 +76,7 @@ import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constan
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.rateUsKey
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.rateUsText
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.splash_status
+import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.updateScreenStatus
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.userIp
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.CustomDialogue
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Defamation
@@ -135,18 +140,15 @@ class MainActivity : AppCompatActivity(), DialogListener,
         binding.modelData = viewModel
         adManager = AdManager(this, this, this)
         viewModel?.apiResponseListener = this
-
+        val appOpen = preference?.getAppOpeningValue(Constants.preferenceAppOpening)
+        if (appOpen != null) {
+            preference?.saveAppOpeningValue(Constants.preferenceAppOpening, appOpen + 1)
+        }
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
 
                 if (backBoolean) {
-                    if (ratingGiven != true) {
-                        if (!isFinishing) {
-                            showDialogue()
-                        }
-                    } else {
-                        finishAffinity()
-                    }
+                    finishAffinity()
                 } else {
                     binding?.navHostFragment?.findNavController()?.popBackStack()
                 }
@@ -353,6 +355,7 @@ class MainActivity : AppCompatActivity(), DialogListener,
             viewModel.setUpError("Something went wrong,please retry.")
             Log.d("Exception", "null")
         }
+        //////////
         if (s_token.isNotEmpty() && base_url_scores.isNotEmpty()) {
             liveViewModel.getsliderData()
         }
@@ -380,42 +383,34 @@ class MainActivity : AppCompatActivity(), DialogListener,
 
         }
 
-//        viewModel.isLoading.observe(this) {
-//            if (it) {
-//                binding.lottieHome.visibility = View.VISIBLE
-//            } else {
-//                binding.lottieHome.visibility = View.GONE
-//            }
-//        }
-
         viewModel.dataModelList.observe(this)
         {
-            if (!it.app_version.isNullOrEmpty()) {
-                try {
-                    val version = appVersionCode
-                    try {
-                        val parsedInt = it.app_version!!.toInt()
-                        if (parsedInt > version) {
-                            if (!Constants.app_update_dialog) {
-                                showAppUpdateDialog(it.app_update_text, it.is_permanent_dialog)
-                                Constants.app_update_dialog = true
-                            }
-                        } else {
-                            checkRatingDialog(it)
-                        }
-                    } catch (nfe: java.lang.NumberFormatException) {
-
-                        logger.printLog(tAG, "Exception" + nfe.message)
-                    }
-                } catch (e: PackageManager.NameNotFoundException) {
-                    logger.printLog(tAG, "Exception" + e.message)
-                }
-            } else {
-                checkRatingDialog(it)
-            }
+//            if (!it.app_version.isNullOrEmpty()) {
+//                try {
+//                    val version = appVersionCode
+//                    try {
+//                        val parsedInt = it.app_version!!.toInt()
+//                        if (parsedInt > version) {
+//                            if (!Constants.app_update_dialog) {
+//                                showAppUpdateDialog(it.app_update_text, it.is_permanent_dialog)
+//                                Constants.app_update_dialog = true
+//                            }
+//                        } else {
+//                            checkRatingDialog(it)
+//                        }
+//                    } catch (nfe: java.lang.NumberFormatException) {
+//
+//                        logger.printLog(tAG, "Exception" + nfe.message)
+//                    }
+//                } catch (e: PackageManager.NameNotFoundException) {
+//                    logger.printLog(tAG, "Exception" + e.message)
+//                }
+//            } else {
+//                checkRatingDialog(it)
+//            }
 
             if (!it.application_configurations.isNullOrEmpty()) {
-                showSplashMethod(it.application_configurations)
+                showSplashMethod(it.application_configurations,it)
             }
 
             if (!it.app_ads.isNullOrEmpty()) {
@@ -487,7 +482,25 @@ class MainActivity : AppCompatActivity(), DialogListener,
         }
     }
 
-    private fun showSplashMethod(applicationConfigurations: List<ApplicationConfiguration>?) {
+    private fun showSplashMethod(applicationConfigurations: List<ApplicationConfiguration>?,
+                                 dataModel: DataModel) {
+        var timer: Int = 0
+        val splashDialog = context?.let { Dialog(it,R.style.MyRoundedDialogTheme) }
+        splashDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        splashDialog?.setContentView(R.layout.app_splash_lay)
+
+        val splash_button = splashDialog?.findViewById(R.id.splashBtn) as Button
+        val splash_body = splashDialog?.findViewById(R.id.textView2) as TextView
+        val splash_title = splashDialog?.findViewById(R.id.textView) as TextView
+        val progressBarCircle = splashDialog?.findViewById(R.id.circularProgressBar) as ProgressBar
+        val textSimple = splashDialog?.findViewById(R.id.progressText2) as TextView
+        val textCircle = splashDialog?.findViewById(R.id.progressText) as TextView
+
+        textSimple.isClickable = false
+        textCircle.isClickable = false
+
+
+        ///App configuration.....
         var showingSplash = false
         if (!applicationConfigurations.isNullOrEmpty()) {
             applicationConfigurations.forEach { configValue ->
@@ -505,7 +518,7 @@ class MainActivity : AppCompatActivity(), DialogListener,
                 ///For setting button text
                 if (configValue.key.equals("ButtonText", true)) {
                     if (configValue.value != null) {
-                        binding?.splashButton?.text = configValue.value
+                        splash_button?.text = configValue.value
                     }
 
                 }
@@ -513,7 +526,13 @@ class MainActivity : AppCompatActivity(), DialogListener,
                 ///For setting heading
                 if (configValue.key.equals("Heading", true)) {
                     if (configValue.value != null) {
-                        binding?.splashHeading?.text = configValue.value
+                        splash_title?.text = configValue.value
+                        splash_title.post {
+                            if (splash_title.lineCount > 3) {
+                                splash_title.textSize = 14f // Reduce size when lines exceed 5
+                            }
+                        }
+
                     }
 
                 }
@@ -529,7 +548,12 @@ class MainActivity : AppCompatActivity(), DialogListener,
                 ///For setting body
                 if (configValue.key.equals("DetailText", true)) {
                     if (configValue.value != null) {
-                        binding?.splashBody?.text = configValue.value
+                        splash_body?.text = configValue.value
+                        splash_body.post {
+                            if (splash_body.lineCount > 5) {
+                                splash_body.textSize = 12f // Reduce size when lines exceed 5
+                            }
+                        }
                     }
                 }
 
@@ -538,9 +562,9 @@ class MainActivity : AppCompatActivity(), DialogListener,
                 if (configValue.key.equals("ShowButton", true)) {
                     if (configValue.value != null) {
                         if (configValue.value.equals("True", true)) {
-                            binding?.splashButton?.visibility = View.VISIBLE
+                            splash_button?.visibility = View.VISIBLE
                         } else {
-                            binding?.splashButton?.visibility = View.GONE
+                            splash_button?.visibility = View.GONE
                         }
 
                     }
@@ -549,60 +573,256 @@ class MainActivity : AppCompatActivity(), DialogListener,
 
                 if (configValue.key.equals("ShowSplash", true)) {
                     if (configValue.value.equals("true", true)) {
-                        if (!splash_status) {
+                        if (!updateScreenStatus) {
                             showingSplash = true
                         }
                     }
                 }
-
             }
 
             if (showingSplash) {
                 try {
-                    var timer: Int = time.toInt()
+                    timer = time.toInt()
                     timer *= 1000
-                    binding?.splashLayout?.visibility = View.VISIBLE
-                    binding?.splashButton?.setOnClickListener {
-
+                    splash_button?.setOnClickListener {
                         val uri =
                             Uri.parse(intentLink)
                         val intent = Intent(Intent.ACTION_VIEW, uri)
                         startActivity(intent)
-
                     }
+
                     Handler(Looper.getMainLooper()).postDelayed({
-                        splash_status = true
-                        binding?.splashLayout?.visibility = View.GONE
+                        updateScreenStatus = true
+                        textSimple.setTextColor(Color.parseColor("#FF0000"));
+                        textSimple.isClickable = true
+                        textSimple.setOnClickListener {
+                            splashDialog.dismiss()
+                        }
+
                     }, timer.toLong())
+
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        textCircle.isClickable = true
+                        textCircle.text = "Skip"
+                        textCircle.setOnClickListener {
+                            splashDialog.dismiss()
+                        }
+                    }, timer.toLong()+300)
                 } catch (e: NumberFormatException) {
 
                 }
-
             }
         }
 
+
+        progressBarCircle?.max = timer
+        startProgress(timer,textSimple)
+        startProgressCircle(timer, progressBarCircle,textCircle)
+
+
+        val window = splashDialog?.window
+        if (window != null) {
+            val marginInPx = 10
+            val layoutParams = window.attributes
+            val displayMetrics = window.windowManager.defaultDisplay
+
+//            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
+            val screenWidth = displayMetrics.width
+            layoutParams.width = screenWidth - (2 * marginInPx)
+            // layoutParams.height = LayoutParams.WRAP_CONTENT // Or MATCH_PARENT if needed
+            window.attributes = layoutParams
+        }
+
+//        splashDialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+
+        splashDialog?.setCancelable(false)
+
+
+        if (!isFinishing) {
+            if (showingSplash) {
+                if (!updateScreenStatus) {
+                    splashDialog?.show()
+                }
+            }
+            else{
+                //splash is not showing...
+                if (!dataModel.app_version.isNullOrEmpty()) {
+                    try {
+                        val version: Int = BuildConfig.VERSION_CODE
+                        try {
+                            val parsedInt = dataModel.app_version!!.toInt()
+                            if (parsedInt > version) {
+                                if (!Constants.app_update_dialog) {
+                                    showAppUpdateDialog(dataModel.app_update_text, dataModel.is_permanent_dialog)
+                                    Constants.app_update_dialog = true
+                                }
+                            } else {
+                                if (!dataModel.application_configurations.isNullOrEmpty()) {
+                                    val status = preference?.getRateUsBool(rateUsKey)
+                                    if (status != true) {
+                                        dataModel.application_configurations?.forEach { config ->
+                                            if (config.key.equals("rateShow", true)) {
+                                                if (config.value != null) {
+                                                    if (config.value.equals("True", true)) {
+                                                        rateUsDialogValue = true
+                                                    } else {
+                                                        rateUsDialogValue = false
+                                                    }
+                                                }
+                                            }
+
+                                            if (config.key.equals("rateText", true)) {
+                                                if (config.value != null) {
+                                                    rateUsText = config.value.toString()
+                                                }
+                                            }
+                                        }
+                                        if (rateUsDialogValue) {
+                                            if (!rateShown) {
+                                                rateShown = true
+                                                val appOpenVal = preference?.getAppOpeningValue(Constants.preferenceAppOpening)
+                                                if (appOpenVal != null) {
+                                                    if (appOpenVal % 2 == 0){
+                                                        rateUsDialog(rateUsText)
+                                                    }
+                                                }
+
+                                            }
+                                        }
+                                    }
+//                        Log.d("ValuesIn", "msf" + rateUsDialogValue + " " + rateUsText)
+                                }
+                            }
+                        } catch (nfe: java.lang.NumberFormatException) {
+
+                            logger.printLog("tAG", "Exception" + nfe.message)
+                        }
+                    } catch (e: PackageManager.NameNotFoundException) {
+                        logger.printLog("tAG", "Exception" + e.message)
+                    }
+                } else {
+                    //check rate us dialog....
+                    if (!dataModel.application_configurations.isNullOrEmpty()) {
+                        val status = preference?.getRateUsBool(rateUsKey)
+                        if (status != true) {
+                            dataModel.application_configurations?.forEach { config ->
+                                if (config.key.equals("rateShow", true)) {
+                                    if (config.value != null) {
+                                        if (config.value.equals("True", true)) {
+                                            rateUsDialogValue = true
+                                        } else {
+                                            rateUsDialogValue = false
+                                        }
+                                    }
+                                }
+
+                                if (config.key.equals("rateText", true)) {
+                                    if (config.value != null) {
+                                        rateUsText = config.value.toString()
+                                    }
+                                }
+                            }
+                            if (rateUsDialogValue) {
+                                if (!rateShown) {
+                                    rateShown = true
+                                    val appOpenVal = preference?.getAppOpeningValue(Constants.preferenceAppOpening)
+                                    if (appOpenVal != null) {
+                                        if (appOpenVal % 2 == 0){
+                                            rateUsDialog(rateUsText)
+                                        }
+                                    }
+//                                rateUsDialog(rateUsText)
+                                }
+                            }
+                        }
+//                        Log.d("ValuesIn", "msf" + rateUsDialogValue + " " + rateUsText)
+                    }
+                }
+            }
+
+        }
+    }
+    private val handler = Handler(Looper.getMainLooper())
+
+    private fun startProgress(
+        progressValue: Int,
+        textSimple: TextView
+    ) {
+        Thread {
+            for (progress in 0..progressValue step 100) {
+                handler.post {
+                    val midValue =  progressValue - progress
+                    val intValueAfter = midValue/1000
+                    if (intValueAfter >= 0) {
+                        textSimple.text = "Skip" + "(" + intValueAfter.toString() + ")"
+                    }
+                }
+                Thread.sleep(100)
+                // Simulate work
+            }
+        }.start()
+    }
+
+    private fun startProgressCircle(
+        progressValue: Int,
+        progressBar: ProgressBar,
+        textCircle: TextView
+    ) {
+        Thread {
+            for (progress in 0..progressValue step 100) {
+                handler.post {
+                    val midValue =  progressValue - progress
+                    progressBar?.setProgress(progress)
+                    val intValueAfter = midValue/1000
+                    if (intValueAfter >=0) {
+                        textCircle.text = intValueAfter.toString()
+                    }
+
+                }
+                Thread.sleep(100) // Simulate work
+//                progressValueee = progressValueee -1000
+            }
+        }.start()
     }
 
     private fun rateUsDialog(
         rateText: String?
     ) {
-        dialog2 = context?.let { Dialog(it) }
+        dialog2 = context?.let { Dialog(it, R.style.MyRoundedDialogTheme) }
         dialog2?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog2?.setContentView(R.layout.rating_layout)
+        dialog2?.setContentView(R.layout.rate_us_new)
 
-        val rateClicked = dialog2?.findViewById(R.id.rateUs) as Button
-        val cancelCliked = dialog2?.findViewById(R.id.cancelUs) as Button
-        val rateTxt = dialog2?.findViewById(R.id.rateUsTitle) as TextView
+        val rateClicked = dialog2?.findViewById(R.id.rateus) as Button
+        val later_click_text = dialog2?.findViewById(R.id.laterText) as TextView
 
-        rateTxt.text = rateText
+        val rateUsText = dialog2?.findViewById(R.id.textView2) as TextView
+
+        rateUsText.text = rateText
 
         rateClicked.setOnClickListener {
             rateClicked()
         }
 
-        cancelCliked.setOnClickListener {
+        later_click_text.setOnClickListener {
             dialog2?.dismiss()
         }
+
+        val window = dialog2?.window
+        if (window != null) {
+            val marginInPx = 10
+            val layoutParams = window.attributes
+            val displayMetrics = window.windowManager.defaultDisplay
+
+//            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
+            val screenWidth = displayMetrics.width
+
+            layoutParams.width = screenWidth - (2 * marginInPx)
+            // layoutParams.height = LayoutParams.WRAP_CONTENT // Or MATCH_PARENT if needed
+            window.attributes = layoutParams
+        }
+
+        // Change this to your desired margin (in pixels)
+
 
         if (!isFinishing) {
             dialog2?.show()
@@ -630,12 +850,12 @@ class MainActivity : AppCompatActivity(), DialogListener,
     }
 
     private fun showAppUpdateDialog(appUpdateText: String?, permanent: Boolean?) {
-        val dialog = context?.let { Dialog(it) }
+        val dialog = context?.let { Dialog(it, R.style.MyRoundedDialogTheme) }
         dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog?.setContentView(R.layout.app_update_layout)
-        val textExit = dialog?.findViewById(R.id.no_thanks) as Button
-        val textRate2 = dialog.findViewById(R.id.update) as Button
-        val textUpdate = dialog.findViewById(R.id.app_update_txt) as TextView
+        dialog?.setContentView(R.layout.update_layout)
+        val textExit = dialog?.findViewById(R.id.laterTextUpdate) as TextView
+        val textRate2 = dialog.findViewById(R.id.updateBtn) as Button
+        val textUpdate = dialog.findViewById(R.id.textView2) as TextView
 
         if (permanent == true) {
             dialog.setCancelable(false)
@@ -663,6 +883,20 @@ class MainActivity : AppCompatActivity(), DialogListener,
 
         textRate2.setOnClickListener {
             rateClicked()
+        }
+
+        val window = dialog?.window
+        if (window != null) {
+            val marginInPx = 10
+            val layoutParams = window.attributes
+            val displayMetrics = window.windowManager.defaultDisplay
+
+//            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT
+            val screenWidth = displayMetrics.width
+
+            layoutParams.width = screenWidth - (2 * marginInPx)
+            // layoutParams.height = LayoutParams.WRAP_CONTENT // Or MATCH_PARENT if needed
+            window.attributes = layoutParams
         }
 
 
