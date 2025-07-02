@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.traumsportzone.live.cricket.tv.scores.databinding.NewsApiLayoutBinding
 import com.traumsportzone.live.cricket.tv.scores.databinding.SquadLayoutBinding
 import com.traumsportzone.live.cricket.tv.scores.score.model.StoryList
-import com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.LiveScoreDetailDirections
 import com.traumsportzone.live.cricket.tv.scores.score.utility.Cons
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.interfaces.NavigateData
 
@@ -58,8 +57,8 @@ class NewsAdapter(private val navigateData: NavigateData) :
 
         holder.itemView.setOnClickListener {
             Cons.newsId = currentList[position].story?.id.toString()
-            val direction =  LiveScoreDetailDirections.actionLiveDetailsToNewsDetailFragment()
-            navigateData.navigation(direction)
+//            val direction =  LiveScoreDetailDirections.actionLiveDetailsToNewsDetailFragment()
+//            navigateData.navigation(direction)
         }
 
     }

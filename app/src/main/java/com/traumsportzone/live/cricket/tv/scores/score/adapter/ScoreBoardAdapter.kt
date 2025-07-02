@@ -21,34 +21,31 @@ class ScoreBoardAdapter(private val context: Context) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(matchScoreCard: ScoreCardMatch, contextScore: Context) {
-            if (matchScoreCard.batTeamDetails != null) {
-                var inning_id=""
-                if (matchScoreCard.inningsId==1){
-                    inning_id ="1st"
-                }
-                else if (matchScoreCard.inningsId==2)
-                {
-                    inning_id ="1st"
-                }
-                else if (matchScoreCard.inningsId==3)
-                {
-                    inning_id ="2nd"
-                } else if (matchScoreCard.inningsId==4)
-                {
-                    inning_id ="2nd"
+
+            if (matchScoreCard != null) {
+                var inning_id = ""
+                if (matchScoreCard.inningsId == 1) {
+                    inning_id = "1st"
+                } else if (matchScoreCard.inningsId == 2) {
+                    inning_id = "1st"
+                } else if (matchScoreCard.inningsId == 3) {
+                    inning_id = "2nd"
+                } else if (matchScoreCard.inningsId == 4) {
+                    inning_id = "2nd"
                 }
 
 
-                binding?.teamInning?.text = matchScoreCard.batTeamDetails!!.batTeamName?.toString()+" "+inning_id.toString()+" Inning"
+                binding?.teamInning?.text =
+                    matchScoreCard?.batTeamName?.toString() + " " + inning_id.toString() + " Inning"
                 if (matchScoreCard.scoreDetails != null) {
-                    binding?.teamScore?.text = matchScoreCard.scoreDetails!!.runs.toString() + "-" +
-                            matchScoreCard.scoreDetails!!.wickets.toString() + " " + "(" + matchScoreCard.scoreDetails!!
+                    binding?.teamScore?.text = matchScoreCard.score.toString() + "-" +
+                            matchScoreCard.wickets.toString() + " " + "(" + matchScoreCard
                         .overs.toString() + " Ov" + ")"
                 }
                 //if batting team details are available....
-                if (!matchScoreCard.batTeamDetails!!.batsmenData.isNullOrEmpty()) {
+                if (!matchScoreCard.batsman.isNullOrEmpty()) {
                     // if batting team  array is not empty...
-                    val newList = matchScoreCard.batTeamDetails!!.batsmenData.filter {
+                    val newList = matchScoreCard.batsman.filter {
                         it.balls != null && it.balls!! > 0
                     }
                     val listAdapter =
@@ -60,18 +57,18 @@ class ScoreBoardAdapter(private val context: Context) :
                 }
 
                 //for setting extra data...
-                if (matchScoreCard.extrasData != null) {
-                    if (matchScoreCard.extrasData!!.total != null) {
-                        if (matchScoreCard.extrasData!!.total!! > 0) {
+                if (matchScoreCard.extras != null) {
+                    if (matchScoreCard.extras!!.total != null) {
+                        if (matchScoreCard.extras!!.total!! > 0) {
                             binding?.extraRecord?.visibility = View.VISIBLE
                             ///Extra record is available....
                             val extraString =
-                                "(" + "b " + matchScoreCard?.extrasData?.byes.toString() +
-                                        ", lb " + matchScoreCard.extrasData!!.legByes + ", w " +
-                                        matchScoreCard.extrasData!!.wides.toString() + ", nb " +
-                                        matchScoreCard.extrasData!!.noBalls.toString() + ", p " + matchScoreCard.extrasData!!.penalty.toString() + ")"
+                                "(" + "b " + matchScoreCard?.extras?.byes.toString() +
+                                        ", lb " + matchScoreCard.extras!!.legByes + ", w " +
+                                        matchScoreCard.extras!!.wides.toString() + ", nb " +
+                                        matchScoreCard.extras!!.noBalls.toString() + ", p " + matchScoreCard.extras!!.penalty.toString() + ")"
                             val s = SpannableStringBuilder()
-                                .bold { append(matchScoreCard?.extrasData?.total.toString()) }
+                                .bold { append(matchScoreCard?.extras?.total.toString()) }
                                 .append(extraString)
                             binding?.extraRecord?.visibility = View.VISIBLE
                             binding?.extraValue?.text = s
@@ -89,11 +86,11 @@ class ScoreBoardAdapter(private val context: Context) :
                         if (matchScoreCard.scoreDetails!!.overs!! > 0.0) {
                             binding?.Total?.visibility = View.VISIBLE
                             val setTotal =
-                                "(" + " " + matchScoreCard.scoreDetails!!.wickets?.toString() + " wkts" +
-                                        "," + matchScoreCard.scoreDetails!!.overs.toString() +
+                                "(" + " " + matchScoreCard.wickets?.toString() + " wkts" +
+                                        "," + matchScoreCard.overs.toString() +
                                         " Ov" + ")"
                             val s = SpannableStringBuilder()
-                                .bold { append(matchScoreCard?.scoreDetails?.runs.toString()) }
+                                .bold { append(matchScoreCard?.score.toString()) }
                                 .append(setTotal)
                             binding?.Total?.visibility = View.VISIBLE
                             binding?.TotalValue?.text = s
@@ -104,10 +101,10 @@ class ScoreBoardAdapter(private val context: Context) :
 
                 }
 
-                if (!matchScoreCard.bowlTeamDetails!!.bowlersData.isNullOrEmpty()) {
+                if (!matchScoreCard.bowler.isNullOrEmpty()) {
                     // if batting team  array is not empty...
-                    val newList = matchScoreCard.bowlTeamDetails!!.bowlersData.filter {
-                        it.overs != null && it.overs!! > 0.0
+                    val newList = matchScoreCard.bowler.filter {
+                        it.overs != null
                     }
                     val listAdapter =
                         BowlerStatsAdapter(contextScore)
@@ -117,25 +114,22 @@ class ScoreBoardAdapter(private val context: Context) :
                     listAdapter.submitList(newList)
                 }
 
-                if (!matchScoreCard.wicketsData.isNullOrEmpty()) {
+                if (!matchScoreCard.fow?.fow.isNullOrEmpty()) {
 
-                    val stringBuilder=StringBuilder()
-                    matchScoreCard.wicketsData.forEach {
-                        wicketsData ->
-                        val string = ""+wicketsData.wktRuns.toString()+"-"+
-                                wicketsData.wktNbr.toString()+"("+
-                                wicketsData.batName.toString()+", "+wicketsData.wktOver.toString()+" Ov)"+", "
+                    val stringBuilder = StringBuilder()
+                    matchScoreCard.fow?.fow?.forEach { wicketsData ->
+                        val string = "" + wicketsData.wktRuns.toString() + "-" +
+                                wicketsData.ballNbr.toString() + "(" +
+                                wicketsData.batName.toString() + ", " + wicketsData.wktOver.toString() + " Ov)" + ", "
                         stringBuilder.append(string)
                     }
 
                     binding?.fallOfWckValue?.text = stringBuilder.toString()
-                    binding?.fallWickets?.visibility=View.VISIBLE
-                    binding?.fallOfWckValue?.visibility=View.VISIBLE
-                }
-                else
-                {
-                    binding?.fallWickets?.visibility=View.GONE
-                    binding?.fallOfWckValue?.visibility=View.GONE
+                    binding?.fallWickets?.visibility = View.VISIBLE
+                    binding?.fallOfWckValue?.visibility = View.VISIBLE
+                } else {
+                    binding?.fallWickets?.visibility = View.GONE
+                    binding?.fallOfWckValue?.visibility = View.GONE
 
                 }
 

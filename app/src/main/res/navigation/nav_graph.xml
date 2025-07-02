@@ -44,9 +44,7 @@
             android:name="getDetails"
             app:nullable="true"
             app:argType="com.traumsportzone.live.cricket.tv.scores.score.model.LiveScoresModel" />
-        <action
-            android:id="@+id/action_live_details_to_newsDetailFragment"
-            app:destination="@id/newsDetailFragment" />
+
 
     </fragment>
 
@@ -278,6 +276,15 @@
             android:id="@+id/action_venuMatchesFragment_to_live_details"
             app:destination="@id/live_details" />
     </fragment>
+    <fragment
+        android:id="@+id/news"
+        android:name="com.traumsportzone.live.cricket.tv.scores.score.ui.fragments.matchdetail.NewsFragment"
+        tools:layout="@layout/news_layout"
+        android:label="News Fragment">
 
+        <action
+            android:id="@+id/action_news_to_newsDetailFragment"
+            app:destination="@id/newsDetailFragment" />
+    </fragment>
 </navigation>
 

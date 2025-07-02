@@ -48,9 +48,9 @@ class CommentaryViewModel : ViewModel() {
     val newsDetail: LiveData<NewsdetailModel?>
         get() = _newsDetail
 
-    init {
-        _isLoading.value = true
-    }
+    private val _isLoadingBoard = MutableLiveData<Boolean>()
+    val isLoadingBoard: LiveData<Boolean>
+        get() = _isLoadingBoard
 
     fun loadCommentary() {
         _isLoading.value = true
@@ -99,7 +99,10 @@ class CommentaryViewModel : ViewModel() {
             }
         }
     }
+
+
     fun loadScoreBoard(){
+        _isLoadingBoard.value = true
         coroutineScope.launch {
             getMatchScoreBoard()
         }
@@ -158,7 +161,7 @@ class CommentaryViewModel : ViewModel() {
                     if (it != null) {
                         apiResponseListener?.onSuccess()
                         _scoreCardModel.value = it
-//                        _isLoading.value = false
+                        _isLoadingBoard.value = false
                         apiResponseListener?.onSuccess()
                     }
 
@@ -170,6 +173,7 @@ class CommentaryViewModel : ViewModel() {
             Log.d("live Api", "Exception : ${e.localizedMessage}")
             Log.d("live Api", "Exception : ${e.cause}")
             withContext(Dispatchers.Main) {
+                _isLoadingBoard.value = false
                 apiResponseListener?.onFailure("Something went wrong,please retry")
             }
 
@@ -198,7 +202,7 @@ class CommentaryViewModel : ViewModel() {
 
             }
 
-        } catch (e: Exception) {
+        } catch (e: java.lang.Exception) {
 
             Log.d("live Api", "Exception : ${e.localizedMessage}")
             Log.d("live Api", "Exception : ${e.cause}")

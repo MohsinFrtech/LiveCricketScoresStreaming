@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.ironsource.la
 import com.traumsportzone.live.cricket.tv.scores.R
 import com.traumsportzone.live.cricket.tv.scores.databinding.MainStatsLayBinding
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.highestAvgstattypeid

@@ -1,14 +1,18 @@
 package com.traumsportzone.live.cricket.tv.scores.score.model
 
 import com.google.gson.annotations.SerializedName
-
 data class CommentryModelClass(
-    @SerializedName("commentaryList")
-    var commentaryList: ArrayList<CommentaryList> = arrayListOf(),
-    @SerializedName("matchHeader")
-    var matchHeader: MatchHeader? = MatchHeader(),
+
+    @SerializedName("comWrapper")
+    var comWrapper: ArrayList<ComWrapper> = arrayListOf(),
     @SerializedName("miniscore")
     var miniscore: Miniscore? = Miniscore(),
+    @SerializedName("matchHeaders")
+    var matchHeaders: MatchHeader? = MatchHeader(),
+    @SerializedName("appIndex")
+    var appIndex: AppIndex? = AppIndex(),
+    @SerializedName("responseLastUpdated")
+    var responseLastUpdated: String? = null,
     @SerializedName("commentarySnippetList")
     var commentarySnippetList: ArrayList<CommentarySnippet> = arrayListOf(),
     @SerializedName("page")
@@ -17,109 +21,116 @@ data class CommentryModelClass(
     var enableNoContent: Boolean? = null,
     @SerializedName("matchVideos")
     var matchVideos: ArrayList<MatchVideos> = arrayListOf(),
-    @SerializedName("responseLastUpdated")
-    var responseLastUpdated: Long? = null
+    ///////////////////
+)
 
+data class ComWrapper (
+    @SerializedName("commentary" ) var commentary : CommentaryList? = CommentaryList()
 )
 data class MatchVideos(
-    @SerializedName("infraType"     ) var infraType     : String?             = null,
-    @SerializedName("headline"      ) var headline      : String?             = null,
-    @SerializedName("commTimestamp" ) var commTimestamp : String?             = null,
-    @SerializedName("itemId"        ) var itemId        : String?             = null,
-    @SerializedName("appLinkUrl"    ) var appLinkUrl    : String?             = null,
-    @SerializedName("imageId"       ) var imageId       : Int?                = null,
-    @SerializedName("mappingId"     ) var mappingId     : String?             = null,
-    @SerializedName("videoUrl"      ) var videoUrl      : String?             = null,
-    @SerializedName("adTag"         ) var adTag         : String?             = null,
-    @SerializedName("language"      ) var language      : String?             = null,
-    @SerializedName("videoId"       ) var videoId       : Long?                = null,
-    @SerializedName("videoType"     ) var videoType     : String?             = null,
-    @SerializedName("category"      ) var category      : ArrayList<Category> = arrayListOf(),
-    @SerializedName("tags"          ) var tags          : ArrayList<Tags>     = arrayListOf()
+    @SerializedName("infraType") var infraType: String? = null,
+    @SerializedName("headline") var headline: String? = null,
+    @SerializedName("commTimestamp") var commTimestamp: String? = null,
+    @SerializedName("itemId") var itemId: String? = null,
+    @SerializedName("appLinkUrl") var appLinkUrl: String? = null,
+    @SerializedName("imageId") var imageId: Int? = null,
+    @SerializedName("mappingId") var mappingId: String? = null,
+    @SerializedName("videoUrl") var videoUrl: String? = null,
+    @SerializedName("adTag") var adTag: String? = null,
+    @SerializedName("language") var language: String? = null,
+    @SerializedName("videoId") var videoId: Long? = null,
+    @SerializedName("videoType") var videoType: String? = null,
+    @SerializedName("category") var category: ArrayList<CategoryCommentary> = arrayListOf(),
+    @SerializedName("tags") var tags: ArrayList<Tags> = arrayListOf()
 )
 
-data class Tags (
+data class Tags(
 
-    @SerializedName("itemName" ) var itemName : String? = null,
-    @SerializedName("itemType" ) var itemType : String? = null,
-    @SerializedName("itemId"   ) var itemId   : String? = null
+    @SerializedName("itemName") var itemName: String? = null,
+    @SerializedName("itemType") var itemType: String? = null,
+    @SerializedName("itemId") var itemId: String? = null
+
+)
+
+data class CategoryCommentary(
+
+    @SerializedName("id") var id: Int? = null,
+    @SerializedName("name") var name: String? = null,
+    @SerializedName("imageID") var imageID: Int? = null
 
 )
 
-data class Category (
-
-    @SerializedName("id"      ) var id      : Int?    = null,
-    @SerializedName("name"    ) var name    : String? = null,
-    @SerializedName("imageID" ) var imageID : Int?    = null
-
-)
 data class CommentarySnippet(
-    @SerializedName("commId"        ) var commId        : Int?                  = null,
-    @SerializedName("matchId"       ) var matchId       : Int?                  = null,
-    @SerializedName("inningsId"     ) var inningsId     : Int?                  = null,
-    @SerializedName("infraType"     ) var infraType     : String?               = null,
-    @SerializedName("headline"      ) var headline      : String?               = null,
-    @SerializedName("imageId"       ) var imageId       : Int?                  = null,
-    @SerializedName("itemId"        ) var itemId        : String?               = null,
-    @SerializedName("timestamp"     ) var timestamp     : Long?                  = null,
-    @SerializedName("parsedContent" ) var parsedContent : ArrayList<String>     = arrayListOf(),
-    @SerializedName("videoGeo"      ) var videoGeo      : ArrayList<String>     = arrayListOf(),
-    @SerializedName("videoType"     ) var videoType     : String?               = null,
-    @SerializedName("url"           ) var url           : String?               = null,
-    @SerializedName("isLive"        ) var isLive        : Boolean?              = null,
-    @SerializedName("videoId"       ) var videoId       : Long?                  = null,
-    @SerializedName("mappingId"     ) var mappingId     : String?               = null,
-    @SerializedName("videoUrl"      ) var videoUrl      : String?               = null,
-    @SerializedName("adTag"         ) var adTag         : String?               = null,
-    @SerializedName("categories"    ) var categories    : ArrayList<Categories> = arrayListOf(),
-    @SerializedName("language"      ) var language      : String?               = null,
-    @SerializedName("planId"        ) var planId        : Int?                  = null,
-    @SerializedName("tags"          ) var tags          : ArrayList<String>     = arrayListOf(),
-    @SerializedName("isPremiumFree" ) var isPremiumFree : Boolean?              = null
+    @SerializedName("commId") var commId: Int? = null,
+    @SerializedName("matchId") var matchId: Int? = null,
+    @SerializedName("inningsId") var inningsId: Int? = null,
+    @SerializedName("infraType") var infraType: String? = null,
+    @SerializedName("headline") var headline: String? = null,
+    @SerializedName("imageId") var imageId: Int? = null,
+    @SerializedName("itemId") var itemId: String? = null,
+    @SerializedName("timestamp") var timestamp: Long? = null,
+    @SerializedName("parsedContent") var parsedContent: ArrayList<String> = arrayListOf(),
+    @SerializedName("videoGeo") var videoGeo: ArrayList<String> = arrayListOf(),
+    @SerializedName("videoType") var videoType: String? = null,
+    @SerializedName("url") var url: String? = null,
+    @SerializedName("isLive") var isLive: Boolean? = null,
+    @SerializedName("videoId") var videoId: Long? = null,
+    @SerializedName("mappingId") var mappingId: String? = null,
+    @SerializedName("videoUrl") var videoUrl: String? = null,
+    @SerializedName("adTag") var adTag: String? = null,
+    @SerializedName("categories") var categories: ArrayList<Categories> = arrayListOf(),
+    @SerializedName("language") var language: String? = null,
+    @SerializedName("planId") var planId: Int? = null,
+    @SerializedName("tags") var tags: ArrayList<String> = arrayListOf(),
+    @SerializedName("isPremiumFree") var isPremiumFree: Boolean? = null
 
 )
 
-data class Categories (
+data class Categories(
 
-    @SerializedName("ID"      ) var ID      : Int?    = null,
-    @SerializedName("name"    ) var name    : String? = null,
-    @SerializedName("imageID" ) var imageID : Int?    = null
+    @SerializedName("ID") var ID: Int? = null,
+    @SerializedName("name") var name: String? = null,
+    @SerializedName("imageID") var imageID: Int? = null
 
 )
-data class OverSeperator( @SerializedName("score"              ) var score              : Double?              = null,
-                          @SerializedName("wickets"            ) var wickets            : Double?              = null,
-                          @SerializedName("inningsId"          ) var inningsId          : Int?              = null,
-                          @SerializedName("o_summary"          ) var oSummary           : String?           = null,
-                          @SerializedName("runs"               ) var runs               : Double?              = null,
-                          @SerializedName("batStrikerIds"      ) var batStrikerIds      : ArrayList<Int>    = arrayListOf(),
-                          @SerializedName("batStrikerNames"    ) var batStrikerNames    : ArrayList<String> = arrayListOf(),
-                          @SerializedName("batStrikerRuns"     ) var batStrikerRuns     : Double?              = null,
-                          @SerializedName("batStrikerBalls"    ) var batStrikerBalls    : Double?              = null,
-                          @SerializedName("batNonStrikerIds"   ) var batNonStrikerIds   : ArrayList<Int>    = arrayListOf(),
-                          @SerializedName("batNonStrikerNames" ) var batNonStrikerNames : ArrayList<String> = arrayListOf(),
-                          @SerializedName("batNonStrikerRuns"  ) var batNonStrikerRuns  : Double?              = null,
-                          @SerializedName("batNonStrikerBalls" ) var batNonStrikerBalls : Double?              = null,
-                          @SerializedName("bowlIds"            ) var bowlIds            : ArrayList<Int>    = arrayListOf(),
-                          @SerializedName("bowlNames"          ) var bowlNames          : ArrayList<String> = arrayListOf(),
-                          @SerializedName("bowlOvers"          ) var bowlOvers          : Double?              = null,
-                          @SerializedName("bowlMaidens"        ) var bowlMaidens        : Double?              = null,
-                          @SerializedName("bowlRuns"           ) var bowlRuns           : Double?              = null,
-                          @SerializedName("bowlWickets"        ) var bowlWickets        : Double?              = null,
-                          @SerializedName("timestamp"          ) var timestamp          : Long?              = null,
-                          @SerializedName("overNum"            ) var overNum            : Double?           = null,
-                          @SerializedName("batTeamName"        ) var batTeamName        : String?           = null,
-                          @SerializedName("event"              ) var event              : String?           = null
+
+data class OverSeperator(
+    @SerializedName("score") var score: Double? = null,
+    @SerializedName("wickets") var wickets: Double? = null,
+    @SerializedName("inningsId") var inningsId: Int? = null,
+    @SerializedName("o_summary") var oSummary: String? = null,
+    @SerializedName("runs") var runs: Double? = null,
+    @SerializedName("batStrikerIds") var batStrikerIds: ArrayList<Int> = arrayListOf(),
+    @SerializedName("batStrikerNames") var batStrikerNames: ArrayList<String> = arrayListOf(),
+    @SerializedName("batStrikerRuns") var batStrikerRuns: Double? = null,
+    @SerializedName("batStrikerBalls") var batStrikerBalls: Double? = null,
+    @SerializedName("batNonStrikerIds") var batNonStrikerIds: ArrayList<Int> = arrayListOf(),
+    @SerializedName("batNonStrikerNames") var batNonStrikerNames: ArrayList<String> = arrayListOf(),
+    @SerializedName("batNonStrikerRuns") var batNonStrikerRuns: Double? = null,
+    @SerializedName("batNonStrikerBalls") var batNonStrikerBalls: Double? = null,
+    @SerializedName("bowlIds") var bowlIds: ArrayList<Int> = arrayListOf(),
+    @SerializedName("bowlNames") var bowlNames: ArrayList<String> = arrayListOf(),
+    @SerializedName("bowlOvers") var bowlOvers: Double? = null,
+    @SerializedName("bowlMaidens") var bowlMaidens: Double? = null,
+    @SerializedName("bowlRuns") var bowlRuns: Double? = null,
+    @SerializedName("bowlWickets") var bowlWickets: Double? = null,
+    @SerializedName("timestamp") var timestamp: Long? = null,
+    @SerializedName("overNum") var overNum: Double? = null,
+    @SerializedName("batTeamName") var batTeamName: String? = null,
+    @SerializedName("event") var event: String? = null
 )
+
 data class CommentaryList(
-
-    @SerializedName("commText") var commText: String? = null,
+    @SerializedName("commtxt") var commText: String? = null,
     @SerializedName("timestamp") var timestamp: Long? = null,
     @SerializedName("ballNbr") var ballNbr: Int? = null,
-    @SerializedName("overNumber") var overNumber: Double? = null,
+    @SerializedName("overNum") var overNumber: Double? = null,
     @SerializedName("inningsId") var inningsId: Int? = null,
     @SerializedName("event") var event: String? = null,
     @SerializedName("batTeamName") var batTeamName: String? = null,
-    @SerializedName("commentaryFormats") var commentaryFormats: CommentaryFormats? = CommentaryFormats(),
+    @SerializedName("commentaryFormats" ) var commentaryFormats : ArrayList<CommentaryFormats> = arrayListOf(),
+
+//    @SerializedName("commentaryFormats") var commentaryFormats: CommentaryFormats? = CommentaryFormats(),
     @SerializedName("overSeparator") var overSeparator: OverSeperator? = OverSeperator()
 
 )
@@ -154,9 +165,17 @@ data class PlayerOfTheSeries(
 )
 
 data class CommentaryFormats(
+    @SerializedName("type"  ) var type  : String?          = null,
+    @SerializedName("value" ) var value : ArrayList<Value> = arrayListOf()
+    ////////
+//    @SerializedName("bold") var bold: Bold? = Bold(),
+//    @SerializedName("italic") var italic: Italic? = Italic()
 
-    @SerializedName("bold") var bold: Bold? = Bold(),
-    @SerializedName("italic") var italic: Italic? = Italic()
+)
+
+data class Value (
+    @SerializedName("id") var id    : String? = null,
+    @SerializedName("value") var value : String? = null
 
 )
 
@@ -183,11 +202,11 @@ data class Miniscore(
     @SerializedName("bowlerStriker") var bowlerStriker: BowlerStriker? = BowlerStriker(),
     @SerializedName("bowlerNonStriker") var bowlerNonStriker: BowlerNonStriker? = BowlerNonStriker(),
     @SerializedName("overs") var overs: Double? = null,
-    @SerializedName("recentOvsStats") var recentOvsStats: String? = null,
-    @SerializedName("partnerShip") var partnerShip: PartnerShip? = PartnerShip(),
+    @SerializedName("curOvsStats") var recentOvsStats: String? = null,
+    @SerializedName("partnership") var partnerShip: String? = null,
     @SerializedName("currentRunRate") var currentRunRate: Double? = null,
     @SerializedName("requiredRunRate") var requiredRunRate: Double? = null,
-    @SerializedName("lastWicket") var lastWicket: String? = null,
+    @SerializedName("lastWkt") var lastWicket: String? = null,
     @SerializedName("matchScoreDetails") var matchScoreDetails: MatchScoreDetails? = MatchScoreDetails(),
     @SerializedName("latestPerformance") var latestPerformance: ArrayList<LatestPerformance> = arrayListOf(),
     @SerializedName("ppData") var ppData: PpData? = PpData(),
@@ -250,7 +269,6 @@ data class Pp1(
 )
 
 data class PartnerShip(
-
     @SerializedName("balls") var balls: Int? = null,
     @SerializedName("runs") var runs: Int? = null
 )
@@ -286,55 +304,55 @@ data class InningsScoreList(
 data class BowlerStriker(
 
     @SerializedName("bowlId") var bowlId: Int? = null,
-    @SerializedName("bowlName") var bowlName: String? = null,
+    @SerializedName("name") var bowlName: String? = null,
     @SerializedName("bowlMaidens") var bowlMaidens: Double? = null,
     @SerializedName("bowlNoballs") var bowlNoballs: Double? = null,
-    @SerializedName("bowlOvs") var bowlOvs: Double? = null,
-    @SerializedName("bowlRuns") var bowlRuns: Double? = null,
+    @SerializedName("overs") var bowlOvs: Double? = null,
+    @SerializedName("runs") var bowlRuns: Double? = null,
     @SerializedName("bowlWides") var bowlWides: Double? = null,
-    @SerializedName("bowlWkts") var bowlWkts: Double? = null,
-    @SerializedName("bowlEcon") var bowlEcon: Double? = null
+    @SerializedName("wickets") var bowlWkts: Double? = null,
+    @SerializedName("economy") var bowlEcon: Double? = null
 
 )
 
 data class BatsmanStriker(
 
-    @SerializedName("batBalls") var batBalls: Int? = null,
+    @SerializedName("balls") var batBalls: Int? = null,
     @SerializedName("batDots") var batDots: Int? = null,
-    @SerializedName("batFours") var batFours: Int? = null,
+    @SerializedName("fours") var batFours: Int? = null,
     @SerializedName("batId") var batId: Int? = null,
-    @SerializedName("batName") var batName: String? = null,
+    @SerializedName("name") var batName: String? = null,
     @SerializedName("batMins") var batMins: Int? = null,
-    @SerializedName("batRuns") var batRuns: Int? = null,
+    @SerializedName("runs") var batRuns: Int? = null,
     @SerializedName("batSixes") var batSixes: Int? = null,
-    @SerializedName("batStrikeRate") var batStrikeRate: Double? = null
+    @SerializedName("strkRate") var batStrikeRate: Double? = null
 )
 
 data class BowlerNonStriker(
 
     @SerializedName("bowlId") var bowlId: Int? = null,
-    @SerializedName("bowlName") var bowlName: String? = null,
+    @SerializedName("name") var bowlName: String? = null,
     @SerializedName("bowlMaidens") var bowlMaidens: Double? = null,
     @SerializedName("bowlNoballs") var bowlNoballs: Double? = null,
-    @SerializedName("bowlOvs") var bowlOvs: Double? = null,
-    @SerializedName("bowlRuns") var bowlRuns: Double? = null,
+    @SerializedName("overs") var bowlOvs: Double? = null,
+    @SerializedName("runs") var bowlRuns: Double? = null,
     @SerializedName("bowlWides") var bowlWides: Int? = null,
-    @SerializedName("bowlWkts") var bowlWkts: Int? = null,
-    @SerializedName("bowlEcon") var bowlEcon: Double? = null
+    @SerializedName("wickets") var bowlWkts: Int? = null,
+    @SerializedName("economy") var bowlEcon: Double? = null
 
 )
 
 data class BatsmanNonStriker(
 
-    @SerializedName("batBalls") var batBalls: Int? = null,
+    @SerializedName("balls") var batBalls: Int? = null,
     @SerializedName("batDots") var batDots: Int? = null,
-    @SerializedName("batFours") var batFours: Int? = null,
+    @SerializedName("fours") var batFours: Int? = null,
     @SerializedName("batId") var batId: Int? = null,
-    @SerializedName("batName") var batName: String? = null,
+    @SerializedName("name") var batName: String? = null,
     @SerializedName("batMins") var batMins: Int? = null,
-    @SerializedName("batRuns") var batRuns: Int? = null,
-    @SerializedName("batSixes") var batSixes: Int? = null,
-    @SerializedName("batStrikeRate") var batStrikeRate: Double? = null
+    @SerializedName("runs") var batRuns: Int? = null,
+    @SerializedName("sixes") var batSixes: Int? = null,
+    @SerializedName("strkRate") var batStrikeRate: Double? = null
 
 )
 
@@ -343,7 +361,6 @@ data class BatTeam(
     @SerializedName("teamId") var teamId: Int? = null,
     @SerializedName("teamScore") var teamScore: Int? = null,
     @SerializedName("teamWkts") var teamWkts: Int? = null
-
 )
 
 data class MatchHeader(

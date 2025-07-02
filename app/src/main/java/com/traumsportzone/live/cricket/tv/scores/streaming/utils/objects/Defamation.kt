@@ -4,6 +4,7 @@ import android.os.Build
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.traumsportzone.live.cricket.tv.scores.score.utility.Encryption
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.algoName
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.algoTypeS1
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.algoTypeS2
@@ -18,7 +19,6 @@ import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constan
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.userBase
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.userBaseDel
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants.userIp
-import se.simbio.encryption.Encryption
 import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
@@ -37,7 +37,6 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 import kotlin.experimental.and
-
 
 object Defamation {
 

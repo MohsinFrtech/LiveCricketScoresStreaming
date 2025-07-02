@@ -28,6 +28,15 @@ class ScoreboardFragment : Fragment() {
     ): View? {
         val layout = inflater.inflate(R.layout.score_board_layout, container, false)
         binding = DataBindingUtil.bind(layout)
+        binding?.lifecycleOwner = this
+        scoreBoardViewModel?.loadScoreBoard()
+        scoreBoardViewModel?.isLoadingBoard?.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                binding?.MainLottie?.visibility = View.VISIBLE
+            } else {
+                binding?.MainLottie?.visibility = View.GONE
+            }
+        })
         getMatchScoreBoard()
         return layout
     }
@@ -36,11 +45,13 @@ class ScoreboardFragment : Fragment() {
     private fun getMatchScoreBoard() {
         scoreBoardViewModel?.scoreCardModel?.observe(viewLifecycleOwner, Observer {
             if (it != null) {
-                if (it.matchHeader != null) {
-                    binding?.matchStatus?.text = it.matchHeader?.status?.toString()
+                binding?.noScoreBoardText?.visibility = View.GONE
+                if (it.status != null) {
+                    binding?.matchStatus?.text = it.status?.toString()
                 }
 
                 if (!it.scoreCard.isNullOrEmpty()) {
+                    binding?.noScoreBoardText?.visibility = View.GONE
                     val reverseList = it.scoreCard.reversed()
                     val listAdapter =
                         ScoreBoardAdapter(requireContext())
@@ -49,7 +60,11 @@ class ScoreboardFragment : Fragment() {
                     )
                     binding?.scoreBoardRecycler?.adapter = listAdapter
                     listAdapter.submitList(reverseList)
+                }else{
+                    binding?.noScoreBoardText?.visibility = View.VISIBLE
                 }
+            }else{
+                binding?.noScoreBoardText?.visibility = View.VISIBLE
             }
         })
     }

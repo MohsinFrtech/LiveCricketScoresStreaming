@@ -3,7 +3,7 @@ package com.traumsportzone.live.cricket.tv.scores.score.model
 import com.google.gson.annotations.SerializedName
 
 class ScoreboardModel(
-    @SerializedName("scoreCard") var scoreCard: ArrayList<ScoreCardMatch> = arrayListOf(),
+    @SerializedName("scorecard") var scoreCard: ArrayList<ScoreCardMatch> = arrayListOf(),
     @SerializedName("matchHeader") var matchHeader: MatchHeader? = MatchHeader(),
     @SerializedName("isMatchComplete") var isMatchComplete: Boolean? = null,
     @SerializedName("status") var status: String? = null,
@@ -14,24 +14,62 @@ class ScoreboardModel(
 data class ScoreCardMatch(
 
     @SerializedName("matchId") var matchId: Long? = null,
-    @SerializedName("inningsId") var inningsId: Int? = null,
     @SerializedName("timeScore") var timeScore: Long? = null,
-    @SerializedName("batTeamDetails") var batTeamDetails: BatTeamDetails? = BatTeamDetails(),
     @SerializedName("bowlTeamDetails") var bowlTeamDetails: BowlTeamDetails? = BowlTeamDetails(),
     @SerializedName("scoreDetails") var scoreDetails: ScoreDetails? = ScoreDetails(),
-    @SerializedName("extrasData") var extrasData: ExtrasData? = ExtrasData(),
-    @SerializedName("ppData") var ppData: ArrayList<PpDataScore> = arrayListOf(),
-    @SerializedName("wicketsData") var wicketsData: ArrayList<WicketsData> = arrayListOf(),
-    @SerializedName("partnershipsData") var partnershipsData: ArrayList<PartnershipsData> = arrayListOf()
+//    @SerializedName("pp") var ppData: ArrayList<PpDataScore> = arrayListOf(),
+    @SerializedName("pp"           ) var pp           : Pp?                = Pp(),
+//    @SerializedName("fow") var wicketsData: ArrayList<WicketsData> = arrayListOf(),
+    @SerializedName("partnership") var partnershipClass: PartnershipClass? = PartnershipClass(),
+    @SerializedName("fow"          ) var fow          : Fow?               = Fow(),
+    //////////////
+    @SerializedName("inningsId"    ) var inningsId    : Int?               = null,
+    @SerializedName("batsman"      ) var batsman      : ArrayList<Batsman> = arrayListOf(),
+    @SerializedName("bowler"       ) var bowler       : ArrayList<Bowler>  = arrayListOf(),
+    @SerializedName("extras"       ) var extras       : ExtrasData?        = ExtrasData(),
+//    @SerializedName("pp"           ) var pp           : Pp?                = Pp(),
+    @SerializedName("score"        ) var score        : Double?               = 0.0,
+    @SerializedName("wickets"      ) var wickets      : Int?               = 0,
+    @SerializedName("overs"        ) var overs        : Double?               = 0.0,
+    @SerializedName("runRate"      ) var runRate      : Double?            = 0.0,
+    @SerializedName("batTeamName"  ) var batTeamName  : String?            = null,
+    @SerializedName("batTeamSName" ) var batTeamSName : String?            = null,
+    @SerializedName("ballNbr"      ) var ballNbr      : Int?               = 0,
+    @SerializedName("rpb"          ) var rpb          : Double?            = null,
+)
+data class Pp (
+    @SerializedName("powerPlay" ) var powerPlay : ArrayList<PpDataScore> = arrayListOf()
+)
+
+data class PartnershipClass (
+    @SerializedName("partnership" ) var partnership : ArrayList<PartnershipsData> = arrayListOf()
+)
+
+data class Fow (
+    @SerializedName("fow" ) var fow : ArrayList<WicketsData> = arrayListOf()
+)
+
+
+
+data class Bowler (
+
+    @SerializedName("id"      ) var id      : Int?    = null,
+    @SerializedName("overs"   ) var overs   : String? = null,
+    @SerializedName("wickets" ) var wickets : Int?    = 0,
+    @SerializedName("runs"    ) var runs    : Double?    = 0.0,
+    @SerializedName("economy" ) var economy : String? = null,
+    @SerializedName("name"    ) var name    : String? = null,
+    @SerializedName("balls"   ) var balls   : Int?    = null
 
 )
+
 data class PpDataScore (
 
-    @SerializedName("ppId"        ) var ppId        : Int?    = null,
-    @SerializedName("ppOversFrom" ) var ppOversFrom : Double? = null,
-    @SerializedName("ppOversTo"   ) var ppOversTo   : Double?    = null,
+    @SerializedName("id"        ) var ppId        : Int?    = null,
+    @SerializedName("ovrFrom" ) var ppOversFrom : Double? = null,
+    @SerializedName("ovrTo"   ) var ppOversTo   : Double?    = null,
     @SerializedName("ppType"      ) var ppType      : String? = null,
-    @SerializedName("runsScored"  ) var runsScored  : Int?    = null
+    @SerializedName("run"  ) var runsScored  : Int?    = null
 
 )
 data class ScoreDetails(
@@ -80,22 +118,22 @@ data class PartnershipsData (
 
 data class WicketsData (
 
-    @SerializedName("batId"   ) var batId   : Long?    = null,
-    @SerializedName("batName" ) var batName : String? = null,
-    @SerializedName("wktNbr"  ) var wktNbr  : Int?    = null,
-    @SerializedName("wktOver" ) var wktOver : Double? = null,
-    @SerializedName("wktRuns" ) var wktRuns : Int?    = null,
-    @SerializedName("ballNbr" ) var ballNbr : Int?    = null
+    @SerializedName("batsmanId") var batId   : Long?    = null,
+    @SerializedName("batsmanName") var batName : String? = null,
+    @SerializedName("wktNbr") var wktNbr  : Int?    = null,
+    @SerializedName("overNbr") var wktOver : Double? = null,
+    @SerializedName("runs") var wktRuns : Int?    = null,
+    @SerializedName("ballNbr") var ballNbr : Int?    = null
 
 )
 data class ExtrasData (
 
-    @SerializedName("noBalls" ) var noBalls : Int? = null,
-    @SerializedName("total"   ) var total   : Int? = null,
-    @SerializedName("byes"    ) var byes    : Int? = null,
-    @SerializedName("penalty" ) var penalty : Double? = null,
-    @SerializedName("wides"   ) var wides   : Int? = null,
-    @SerializedName("legByes" ) var legByes : Double? = null
+    @SerializedName("noBalls" ) var noBalls : Int? = 0,
+    @SerializedName("total"   ) var total   : Int? = 0,
+    @SerializedName("byes"    ) var byes    : Int? = 0,
+    @SerializedName("penalty" ) var penalty : Double? = 0.0,
+    @SerializedName("wides"   ) var wides   : Int? = 0,
+    @SerializedName("legByes" ) var legByes : Double? = 0.0
 
 )
 
@@ -146,6 +184,20 @@ data class BatsmenData(
     @SerializedName("isOverseas") var isOverseas: Boolean? = null,
     @SerializedName("inMatchChange") var inMatchChange: String? = null,
     @SerializedName("playingXIChange") var playingXIChange: String? = null
+
+)
+
+data class Batsman (
+
+    @SerializedName("id") var id       : Int?     = null,
+    @SerializedName("balls"    ) var balls    : Int?     = null,
+    @SerializedName("runs"     ) var runs     : Int?     = 0,
+    @SerializedName("fours"    ) var fours    : Int?     = 0,
+    @SerializedName("sixes"    ) var sixes    : Int?     = 0,
+    @SerializedName("strkRate" ) var strkRate : String?  = null,
+    @SerializedName("name"     ) var name     : String?  = null,
+    @SerializedName("isKeeper" ) var isKeeper : Boolean? = null,
+    @SerializedName("outDec"   ) var outDec   : String?  = null
 
 )
 

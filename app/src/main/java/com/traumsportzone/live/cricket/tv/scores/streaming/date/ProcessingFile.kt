@@ -1,8 +1,8 @@
 package com.traumsportzone.live.cricket.tv.scores.streaming.date
 
 
+import com.traumsportzone.live.cricket.tv.scores.score.utility.Encryption
 import com.traumsportzone.live.cricket.tv.scores.streaming.utils.objects.Constants
-import se.simbio.encryption.Encryption
 
 class ProcessingFile {
 

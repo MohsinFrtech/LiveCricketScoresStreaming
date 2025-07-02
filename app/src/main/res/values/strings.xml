@@ -86,13 +86,10 @@
     </string-array>
 
     <string-array name="matches_details">
-        <item>Commentary</item>
         <item>Details</item>
+        <item>Commentary</item>
         <item>Scoreboard</item>
         <item>Squads</item>
-        <item>News</item>
-
-
     </string-array>
 
 

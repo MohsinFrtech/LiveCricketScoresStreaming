@@ -52,7 +52,6 @@ class LiveScoreDetail : Fragment(), AdManagerListener, ApiResponseListener, Dial
         commentaryViewModel.apiResponseListener = this
         //load banner Ad
         adManager = AdManager(requireContext(), requireActivity(), this)
-        binding?.MainLottie?.visibility = View.VISIBLE
 //        if (adLocation1Provider != "none") {
 //            binding?.adView?.let { it1 ->
 //                binding?.fbAdView?.let { it2 ->
@@ -71,14 +70,6 @@ class LiveScoreDetail : Fragment(), AdManagerListener, ApiResponseListener, Dial
             findNavController().popBackStack()
         }
         setUpViewPager()
-        Handler(Looper.getMainLooper()).postDelayed(
-            {
-                setUpViewModel()
-            },
-            1000
-        )
-//        setScoresTextData()
-//        setTeamImages()
         return view
     }
 
@@ -119,18 +110,6 @@ class LiveScoreDetail : Fragment(), AdManagerListener, ApiResponseListener, Dial
     }
 
 
-    private fun setUpViewModel() {
-        commentaryViewModel.loadCommentary()
-        commentaryViewModel.loadScoreBoard()
-        commentaryViewModel.getAllNewsList()
-        commentaryViewModel.isLoading.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                binding?.MainLottie?.visibility = View.VISIBLE
-            } else {
-                binding?.MainLottie?.visibility = View.GONE
-            }
-        })
-    }
 
 
     override fun onAdLoad(value: String) {

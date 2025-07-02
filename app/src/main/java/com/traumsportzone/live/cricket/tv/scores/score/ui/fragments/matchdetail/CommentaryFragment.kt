@@ -68,8 +68,17 @@ class CommentaryFragment : Fragment(), ApiResponseListener {
     }
 
     private fun getAllCommentaryRelatedToMatch() {
+        commentaryViewModel.loadCommentary()
+        commentaryViewModel.isLoading.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                binding?.MainLottie?.visibility = View.VISIBLE
+            } else {
+                binding?.MainLottie?.visibility = View.GONE
+            }
+        })
+
         commentaryViewModel?.commentaryModel?.observe(viewLifecycleOwner, Observer {
-            if (!it?.commentaryList.isNullOrEmpty()) {
+            if (!it?.comWrapper.isNullOrEmpty()) {
                 binding?.model2 = it
                 if (it != null) {
                     setUpCommentaryData(it)
@@ -89,11 +98,11 @@ class CommentaryFragment : Fragment(), ApiResponseListener {
 
     //Set up of commentary data....
     private fun setUpCommentaryData(commentryModelClass: CommentryModelClass) {
-        if (commentryModelClass?.matchHeader != null) {
+        if (commentryModelClass?.matchHeaders != null) {
             binding?.commentaryNotAvailable?.visibility = View.GONE
-            if (commentryModelClass?.matchHeader?.state?.equals("Preview", true) == true
-                || commentryModelClass?.matchHeader?.state?.equals("Delay", true) == true
-                ||commentryModelClass?.matchHeader?.state?.equals("Abandon", true) == true
+            if (commentryModelClass?.matchHeaders?.state?.equals("Preview", true) == true
+                || commentryModelClass?.matchHeaders?.state?.equals("Delay", true) == true
+                ||commentryModelClass?.matchHeaders?.state?.equals("Abandon", true) == true
 
             ) {
                 //match is preview means will started soon.
@@ -103,23 +112,23 @@ class CommentaryFragment : Fragment(), ApiResponseListener {
                 binding?.playerOftheMatch?.visibility = View.GONE
                 binding?.playerOftheMatchName?.visibility = View.GONE
                 binding?.liveMatchDetail?.visibility = View.GONE
-                if (!commentryModelClass.commentaryList.isNullOrEmpty()) {
+                if (!commentryModelClass.comWrapper.isNullOrEmpty()) {
 
                     val listAdapter = CommentaryAdapter()
                     binding?.recyclerViewCommentary?.layoutManager =
                         LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
                     binding?.recyclerViewCommentary?.adapter = listAdapter
-                    listAdapter.submitList(commentryModelClass.commentaryList)
+                    listAdapter.submitList(commentryModelClass.comWrapper)
                     binding?.recyclerViewCommentary?.visibility = View.VISIBLE
 
                 }
             } else {
 
-                if (commentryModelClass?.matchHeader?.state?.equals("Complete", true) == true) {
+                if (commentryModelClass?.matchHeaders?.state?.equals("Complete", true) == true) {
 
-                    if (!commentryModelClass.matchHeader!!.playersOfTheMatch.isNullOrEmpty()) {
+                    if (!commentryModelClass.matchHeaders!!.playersOfTheMatch.isNullOrEmpty()) {
 
-                        commentryModelClass.matchHeader!!.playersOfTheMatch.forEach {
+                        commentryModelClass.matchHeaders!!.playersOfTheMatch.forEach {
                             binding?.playerOftheMatch?.visibility = View.VISIBLE
                             binding?.playerOftheMatchName?.visibility = View.VISIBLE
                             binding?.playerOftheMatchName?.text = it.fullName
@@ -132,20 +141,20 @@ class CommentaryFragment : Fragment(), ApiResponseListener {
                     binding?.playerOftheMatch?.visibility = View.GONE
                     binding?.playerOftheMatchName?.visibility = View.GONE
                 }
-                if (!commentryModelClass.commentaryList.isNullOrEmpty()) {
+                if (!commentryModelClass.comWrapper.isNullOrEmpty()) {
 
                     val listAdapter = CommentaryAdapter()
                     binding?.recyclerViewCommentary?.layoutManager =
                         LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
                     binding?.recyclerViewCommentary?.adapter = listAdapter
-                    listAdapter.submitList(commentryModelClass.commentaryList)
+                    listAdapter.submitList(commentryModelClass.comWrapper)
                     binding?.recyclerViewCommentary?.visibility = View.VISIBLE
 
                 } else {
                     binding?.recyclerViewCommentary?.visibility = View.GONE
                 }
 
-                if (commentryModelClass?.matchHeader?.state?.equals("Toss", true) == true) {
+                if (commentryModelClass?.matchHeaders?.state?.equals("Toss", true) == true) {
                     binding?.liveMatchDetail?.visibility = View.GONE
                     binding?.ketStatResult?.visibility = View.GONE
                     binding?.recentOvs?.visibility = View.GONE
@@ -214,17 +223,7 @@ class CommentaryFragment : Fragment(), ApiResponseListener {
 
 
                         if (commentryModelClass.miniscore!!.partnerShip != null) {
-                            if (commentryModelClass.miniscore!!.partnerShip?.runs != null && commentryModelClass.miniscore!!.partnerShip?.runs != 0) {
-                                binding?.presult?.visibility = View.VISIBLE
-                                binding?.presult?.text =
-                                    "" + commentryModelClass.miniscore!!.partnerShip?.runs.toString() + "(" +
-                                            commentryModelClass.miniscore!!.partnerShip?.balls.toString() + ")"
-
-
-                            } else {
-                                binding?.patner?.visibility = View.GONE
-                                binding?.presult?.visibility = View.GONE
-                            }
+                            binding?.presult?.text =   commentryModelClass?.miniscore?.partnerShip.toString()
                         } else {
                             binding?.patner?.visibility = View.GONE
                             binding?.presult?.visibility = View.GONE
@@ -262,13 +261,13 @@ class CommentaryFragment : Fragment(), ApiResponseListener {
                         }
 
                         //Toss Result
-                        if (commentryModelClass.miniscore!!.matchScoreDetails != null) {
+                        if (commentryModelClass.matchHeaders != null) {
 
-                            if (commentryModelClass.miniscore!!.matchScoreDetails?.tossResults != null) {
+                            if (commentryModelClass.matchHeaders?.tossResults != null) {
                                 binding?.tossResult?.visibility = View.VISIBLE
                                 binding?.tossResult?.text =
-                                    "" + commentryModelClass.miniscore!!.matchScoreDetails?.tossResults?.tossWinnerName.toString() + "" +
-                                            "(" + commentryModelClass.miniscore!!.matchScoreDetails?.tossResults?.decision.toString() + ")"
+                                    "" + commentryModelClass.matchHeaders?.tossResults?.tossWinnerName.toString() + "" +
+                                            "(" + commentryModelClass.matchHeaders?.tossResults?.decision.toString() + ")"
                             } else {
                                 binding?.toss?.visibility = View.GONE
                                 binding?.tossResult?.visibility = View.GONE
@@ -281,7 +280,7 @@ class CommentaryFragment : Fragment(), ApiResponseListener {
                         binding?.liveMatchDetail?.visibility = View.VISIBLE
 
                         /////////////////
-                        if (commentryModelClass?.matchHeader?.state?.equals("Complete", true) == true) {
+                        if (commentryModelClass?.matchHeaders?.state?.equals("Complete", true) == true) {
                             binding?.liveMatchDetail?.visibility = View.GONE
                         }
 

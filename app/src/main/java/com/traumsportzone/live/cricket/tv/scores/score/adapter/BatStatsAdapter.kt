@@ -1,53 +1,37 @@
 package com.traumsportzone.live.cricket.tv.scores.score.adapter
 
-import android.R.attr.content
 import android.R.attr.text
 import android.content.Context
-import android.graphics.Color
-import android.graphics.Typeface
-import android.text.SpannableString
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.style.StyleSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.traumsportzone.live.cricket.tv.scores.R
-import com.traumsportzone.live.cricket.tv.scores.databinding.CommentryLayoutBinding
-import com.traumsportzone.live.cricket.tv.scores.databinding.OverItemLayoutBinding
 import com.traumsportzone.live.cricket.tv.scores.databinding.ScoreCardItemBinding
-import com.traumsportzone.live.cricket.tv.scores.databinding.SquadLayoutBinding
-import com.traumsportzone.live.cricket.tv.scores.score.model.BatsmenData
-import com.traumsportzone.live.cricket.tv.scores.score.model.CommentaryList
-import com.traumsportzone.live.cricket.tv.scores.score.model.PlayerDetails
-import com.traumsportzone.live.cricket.tv.scores.score.model.SquadModel
+import com.traumsportzone.live.cricket.tv.scores.score.model.Batsman
 
 
 class BatStatsAdapter(val context: Context) :
-    ListAdapter<BatsmenData, BatStatsAdapter.ViewHolder>(DiffCallback) {
+    ListAdapter<Batsman, BatStatsAdapter.ViewHolder>(DiffCallback) {
 
     class ViewHolder(private var binding: ScoreCardItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(batData: BatsmenData) {
+        fun bind(batData: Batsman) {
             if (batData.balls!=null)
             {
                 if (batData.balls!! >0){
                     binding?.battingTeamScores?.visibility=View.VISIBLE
-                    binding?.teamTxt2?.text = batData.batName.toString()
+                    binding?.teamTxt2?.text = batData.name.toString()
                     binding?.team12?.text = batData.runs?.toString()
                     binding?.team22?.text = batData.balls?.toString()
                     binding?.team32?.text = batData?.fours?.toString()
                     binding?.team42?.text = batData?.sixes?.toString()
-                    binding?.teamTotal2?.text = batData?.strikeRate?.toString()
+                    binding?.teamTotal2?.text = batData?.strkRate?.toString()
 
-                    if (!batData.outDesc.isNullOrEmpty()){
-                        binding?.outStatusValue?.text = batData.outDesc.toString()
+                    if (!batData.outDec.isNullOrEmpty()){
+                        binding?.outStatusValue?.text = batData.outDec.toString()
                         binding?.outLay?.visibility=View.VISIBLE
                     }
                     else
@@ -70,12 +54,12 @@ class BatStatsAdapter(val context: Context) :
 
     }
 
-    companion object DiffCallback : DiffUtil.ItemCallback<BatsmenData>() {
-        override fun areItemsTheSame(oldItem: BatsmenData, newItem: BatsmenData): Boolean {
-            return oldItem.batId == newItem.batId
+    companion object DiffCallback : DiffUtil.ItemCallback<Batsman>() {
+        override fun areItemsTheSame(oldItem: Batsman, newItem: Batsman): Boolean {
+            return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: BatsmenData, newItem: BatsmenData): Boolean {
+        override fun areContentsTheSame(oldItem: Batsman, newItem: Batsman): Boolean {
             return oldItem == newItem
         }
 
