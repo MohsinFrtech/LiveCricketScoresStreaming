@@ -41,7 +41,7 @@
         <activity
             android:name=".streaming.ui.activities.EntryClass"
             android:exported="true"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullUser"
             android:theme="@style/AppSplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -56,7 +56,7 @@
 
         <activity android:name=".streaming.ui.activities.HomeScreen"
             android:exported="true"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullUser"
             android:theme="@style/HomeScreenTheme">
 
         </activity>
