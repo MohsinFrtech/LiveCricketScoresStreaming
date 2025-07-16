@@ -169,7 +169,7 @@ class HomeScreen : AppCompatActivity(), DialogListener, ApiResponseListener {
         window.setFlags(
             WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE
         )
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.colorPrimary)
+//        window.navigationBarColor = ContextCompat.getColor(this, R.color.colorPrimary)
         preference = SharedPreference(this)
         viewModel?.apiResponseListener = this
         splash_status = false
